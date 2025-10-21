@@ -46,9 +46,15 @@ export class RegisterComponent {
       },
       error: (err: any) => {
         console.error('Erro no registro:', err);
-        // MUDANÇA: Melhorar a extração da mensagem de erro
-        if (err.error && typeof err.error === 'string') {
-            this.errorMessage = err.error; // Erro é uma string simples (ex: "Preencha todos os campos...")
+        
+        // MUDANÇA: Lógica de erro ajustada para capturar a resposta do backend
+        if (err.error && err.error.error) {
+            // Captura a resposta do backend (Map.of("error", ...))
+            // err.error é o JSON, err.error.error é a string da mensagem
+            this.errorMessage = err.error.error; 
+        } else if (err.error && typeof err.error === 'string') {
+            // Captura erros que são apenas strings (ex: do login)
+            this.errorMessage = err.error;
         } else if (err.error && err.error.message) {
             this.errorMessage = err.error.message;
         } else if (err.message) {
