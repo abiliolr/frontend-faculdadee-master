@@ -12,7 +12,6 @@
                 id="login" 
                 name="login"
                 [(ngModel)]="form.login" 
-                required 
                 #login="ngModel"
             />
         </div>
@@ -23,7 +22,6 @@
                 id="usuarioNome" 
                 name="usuarioNome"
                 [(ngModel)]="form.usuarioNome" 
-                required 
                 #usuarioNome="ngModel"
             />
         </div>
@@ -34,8 +32,6 @@
                 id="email" 
                 name="email"
                 [(ngModel)]="form.email" 
-                required 
-                email
                 #email="ngModel"
             />
         </div>
@@ -46,11 +42,10 @@
                 id="password" 
                 name="password"
                 [(ngModel)]="form.senha" 
-                required 
                 #password="ngModel"
             />
         </div>
-        <button type="submit" [disabled]="!registerForm.form.valid">Registrar</button>
+        <button type="submit">Registrar</button>
     </form>
 
     <div class="register-link">
