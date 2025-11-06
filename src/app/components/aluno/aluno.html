@@ -1,0 +1,36 @@
+<div class="container-aluno">
+  <h1 class="titulo-bemvindo">Bem-vindo ao Painel do Aluno!</h1>
+  <p class="mensagem-bemvindo">
+    <b>Aqui você acompanha seu desempenho em cada disciplina.</b><br />
+    <b>Selecione uma matéria e veja seu andamento</b>
+    <br />
+  </p>
+
+  <div class="disciplinas">
+    <button class="btn-disciplina" (click)="mostrarCard('Arquitetura de Computadores')">
+      Arquitetura de Computadores
+    </button>
+    <button class="btn-disciplina" (click)="mostrarCard('Programação Orientada a Objetos')">
+      Programação Orientada a Objetos
+    </button>
+    <button class="btn-disciplina" (click)="mostrarCard('Banco de Dados')">Banco de Dados</button>
+  </div>
+
+  <div class="card" *ngIf="dados">
+    <h2>{{ dados.disciplina }}</h2>
+
+    <p><strong>Faltas:</strong> {{ dados.faltas }}</p>
+    <p><strong>Faltas Restantes:</strong> {{ dados.faltasRestantes }}</p>
+    <p><strong>Presenças:</strong> {{ dados.presencas }}</p>
+
+    <p><strong>Nota 1º Bimestre:</strong> {{ dados.nota1 }}</p>
+    <p><strong>Nota 2º Bimestre:</strong> {{ dados.nota2 }}</p>
+    <p><strong>Média Atual:</strong> {{ dados.media }}</p>
+    <p><strong>Nota Necessária Para Aprovação:</strong> {{ dados.notaNecessaria }}</p>
+
+    <strong>Horários / Datas de Provas:</strong>
+    <ul>
+      <li *ngFor="let prova of dados.horariosProvas">{{ prova }}</li>
+    </ul>
+  </div>
+</div>

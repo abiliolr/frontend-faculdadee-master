@@ -1,0 +1,126 @@
+/* Tipografia moderna e elegante */
+body {
+  font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+  color: #1a1a1a;
+  background: #f2f2f7;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+p {
+  font-size: 24px;
+  opacity: 1;
+}
+
+/* Centralização total na tela */
+.container-aluno {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  justify-content: flex-start;
+  padding-top: 40px;
+  text-align: center;
+}
+
+.disciplinas {
+  display: flex;
+  gap: 14px;
+  margin-top: 12px;
+  justify-content: center;
+}
+
+.btn-disciplina {
+  padding: 12px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 22px;
+  font-weight: 500;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: 0.2s ease-in-out;
+}
+
+/* Cores individuais */
+.btn-disciplina:nth-child(1) {
+  background: #143c69; /* Azul */
+  color: #fff;
+}
+.btn-disciplina:nth-child(2) {
+  background: #08632e; /* Verde */
+  color: #fff;
+}
+.btn-disciplina:nth-child(3) {
+  background: #561970; /* Roxo */
+  color: #fff;
+}
+
+.btn-disciplina:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  opacity: 0.9;
+}
+
+.btn-disciplina:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.card {
+  border-radius: 12px;
+  padding: 20px;
+  background: #ffffff;
+  border-left: 6px solid #4a90e2;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  animation: fadeIn 0.3s ease-in-out;
+  margin-top: 20px;
+  width: 480px;
+  font-size: 22px;
+  line-height: 1.5;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mensagens bem-vindo e escolha */
+.titulo-bemvindo {
+  font-size: 50px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 10px;
+}
+.mensagem-bemvindo {
+  font-size: 26px;
+  color: #555;
+  margin-bottom: 25px;
+}
+.mensagem-escolha {
+  background: #4a90e2;
+  color: #fff;
+  border-radius: 12px;
+  padding: 22px;
+  font-size: 26px;
+  max-width: 700px;
+  margin: 20px auto;
+}
+to {
+  opacity: 1;
+  transform: translateY(0);
+}
