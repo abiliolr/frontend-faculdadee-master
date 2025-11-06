@@ -1,12 +1,14 @@
-/* Estilos do formulário de cadastro */
+/* Estes são os estilos do formulário que estavam em admin.css.
+  Eles devem ficar no CSS do seu próprio componente.
+*/
 .form-container {
     border-radius: 12px;
-    padding: 20px 24px; /* Reduzido para evitar overflow */
+    padding: 20px 24px;
     background: #ffffff;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
     animation: fadeIn 0.3s ease-in-out;
     width: 100%;
-    max-width: 500px; /* Mantido para consistência */
+    max-width: 500px;
     font-size: 18px;
     line-height: 1.5;
     text-align: left;
@@ -41,14 +43,14 @@
 .form-group input,
 .form-group select {
     width: 100%;
-    padding: 10px 12px; /* Reduzido para evitar overflow */
+    padding: 10px 12px;
     border: 1px solid #dbe3ee;
     border-radius: 8px;
     font-size: 16px;
     background: #f7f8fa;
     color: #1a1a1a;
     transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    box-sizing: border-box; /* Garante que o padding não cause overflow */
+    box-sizing: border-box;
 }
 
 .form-group input:focus,
@@ -64,7 +66,7 @@
     background-repeat: no-repeat;
     background-position: right 12px center;
     background-size: 12px;
-    padding-right: 30px; /* Espaço para a seta do select */
+    padding-right: 30px;
 }
 
 .form-group input[type="submit"] {
@@ -85,6 +87,35 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
 }
 
+.form-group input[type="submit"]:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Mensagens de Feedback */
+.error-message,
+.success-message {
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  margin-top: 15px; /* Adicionado para separar do botão */
+}
+
+.error-message {
+  color: red;
+  background-color: #ffe0e0;
+  border: 1px solid red;
+}
+
+.success-message {
+  color: green;
+  background-color: #e0ffe0;
+  border: 1px solid green;
+}
+
+
 /* Animação fadeIn */
 @keyframes fadeIn {
     from {
@@ -94,23 +125,5 @@
     to {
         opacity: 1;
         transform: translateY(0);
-    }
-}
-
-/* Responsividade */
-@media (max-width: 900px) {
-    .container-aluno {
-        margin-left: 0;
-        padding: 20px;
-    }
-    .form-container {
-        width: 95%;
-        max-width: 95%;
-        padding: 16px 20px; /* Reduzido para telas menores */
-    }
-    .sidebar {
-        position: relative;
-        width: 100%;
-        height: auto;
     }
 }

@@ -1,49 +1,46 @@
-<div class="container">
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h2>Painel do Administrador</h2>
-            </div>
-            <nav class="sidebar-nav">
-                <ul>
-                    <li><a href="#" class="active">Alunos</a></li>
-                    <li><a href="#">Professores</a></li>
-                    <li><a href="#">Disciplinas</a></li>
-                    <li><a href="#">Cursos</a></li>
-                </ul>
-            </nav>
-            <button class="btn-logout">Sair</button>
+<!-- 
+  ERRO CORRIGIDO: 
+  Removido todo o HTML duplicado do layout (o <div class="container"> e <div class="sidebar">).
+  O componente filho deve ter APENAS o seu próprio conteúdo (o formulário).
+-->
+<div class="form-container">
+    <h2>Cadastro de Aluno</h2>
+    <!-- ATENÇÃO: Adicionado (ngSubmit), #alunoForm e [(ngModel)] para o formulário funcionar -->
+    <form (ngSubmit)="onSubmit()" #alunoForm="ngForm">
+        <div class="form-group">
+            <label for="matricula">Matrícula:</label>
+            <input type="text" id="matricula" name="matricula" [(ngModel)]="form.matricula" required>
         </div>
-        <div class="container-aluno">
-            <div class="form-container">
-                <h2>Cadastro de Aluno</h2>
-                <form method="POST">
-                    <div class="form-group">
-                        <label for="matricula">Matrícula:</label>
-                        <input type="text" id="matricula" name="matricula" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="nome">Nome Completo:</label>
-                        <input type="text" id="nome" name="nome" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="curso">Curso:</label>
-                        <select id="curso" name="curso" required>
-                            <option value="" disabled selected>Selecione o curso</option>
-                            <option value="engenharia">Engenharia</option>
-                            <option value="medicina">Medicina</option>
-                            <option value="direito">Direito</option>
-                            <option value="administracao">Administração</option>
-                            <option value="outros">Outros</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">E-mail:</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="submit" value="Cadastrar">
-                    </div>
-                </form>
-            </div>
+        <div class="form-group">
+            <label for="nome">Nome Completo:</label>
+            <input type="text" id="nome" name="nome" [(ngModel)]="form.nome" required>
         </div>
-    </div>
+        <div class="form-group">
+            <label for="curso">Curso:</label>
+            <select id="curso" name="curso" [(ngModel)]="form.curso" required>
+                <option value="" disabled selected>Selecione o curso</option>
+                <option value="engenharia">Engenharia</option>
+                <option value="medicina">Medicina</option>
+                <option value="direito">Direito</option>
+                <option value="administracao">Administração</option>
+                <option value="outros">Outros</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="email">E-mail:</label>
+            <input type="email" id="email" name="email" [(ngModel)]="form.email" required>
+        </div>
+        <div class="form-group">
+            <!-- O botão agora é type="submit" e desabilita se o formulário for inválido -->
+            <input type="submit" value="Cadastrar" [disabled]="!alunoForm.form.valid">
+        </div>
+
+        <!-- Mensagens de feedback (opcional, mas bom) -->
+        <div *ngIf="successMessage" class="success-message">
+            {{ successMessage }}
+        </div>
+        <div *ngIf="errorMessage" class="error-message">
+            {{ errorMessage }}
+        </div>
+    </form>
+</div>
