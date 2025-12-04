@@ -1,0 +1,109 @@
+.card-container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px; /* Mais estreito para parecer um widget ou lista */
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+h2 {
+    color: #143c69;
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #f0f2f5;
+    padding-bottom: 12px;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 20px;
+}
+
+/* Linha vertical da timeline */
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 45px; /* Ajustado para alinhar com a data */
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e0e0e0;
+}
+
+.timeline-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.timeline-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: #f0f4f8;
+    border-radius: 8px;
+    margin-right: 25px;
+    border: 2px solid #143c69;
+    z-index: 1; /* Ficar acima da linha */
+    flex-shrink: 0;
+}
+
+.timeline-date .day {
+    font-size: 18px;
+    font-weight: bold;
+    color: #143c69;
+    line-height: 1;
+}
+
+.timeline-date .month {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #555;
+}
+
+.timeline-content {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    flex-grow: 1;
+    border-left: 4px solid #143c69;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.timeline-content h3 {
+    margin: 0 0 5px;
+    font-size: 16px;
+    color: #333;
+}
+
+.prova-nome {
+    margin: 0 0 10px;
+    color: #666;
+    font-size: 14px;
+}
+
+.time-badge {
+    display: inline-flex;
+    align-items: center;
+    background: #e3f2fd;
+    color: #1565c0;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.time-badge svg {
+    margin-right: 4px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,90 @@
+.table-container {
+    border-radius: 12px;
+    padding: 20px 24px;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    animation: fadeIn 0.3s ease-in-out;
+    width: 100%;
+    max-width: 800px; /* Tabela pode ser mais larga */
+    font-size: 18px;
+    line-height: 1.5;
+    text-align: left;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.table-container h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #143c69;
+    margin-bottom: 20px;
+    text-align: center;
+    border-bottom: 2px solid #dbe3ee;
+    padding-bottom: 8px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #dbe3ee;
+}
+
+th {
+    background-color: #f7f8fa;
+    color: #143c69;
+    font-weight: 600;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Status styles */
+.status-presente {
+    color: green;
+    font-weight: bold;
+    background-color: #e0ffe0;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.status-falta {
+    color: red;
+    font-weight: bold;
+    background-color: #ffe0e0;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+/* Button styles */
+.btn-toggle {
+    padding: 6px 12px;
+    background: #143c69;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.btn-toggle:hover {
+    background: #0f2e4f;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
