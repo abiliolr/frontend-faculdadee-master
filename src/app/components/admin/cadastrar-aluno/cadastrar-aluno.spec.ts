@@ -1,18 +1,21 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { CadastrarAlunoComponent } from './cadastrar-aluno';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { FormsModule } from '@angular/forms';
+import { provideZonelessChangeDetection } from '@angular/core';
 
-import { CadastrarAluno } from './cadastrar-aluno';
-
-describe('CadastrarAluno', () => {
-  let component: CadastrarAluno;
-  let fixture: ComponentFixture<CadastrarAluno>;
+describe('CadastrarAlunoComponent', () => {
+  let component: CadastrarAlunoComponent;
+  let fixture: ComponentFixture<CadastrarAlunoComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CadastrarAluno]
+      imports: [CadastrarAlunoComponent, HttpClientTestingModule, FormsModule],
+      providers: [provideZonelessChangeDetection()]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(CadastrarAluno);
+    fixture = TestBed.createComponent(CadastrarAlunoComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

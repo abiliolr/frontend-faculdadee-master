@@ -11,6 +11,9 @@ import { CadastrarAlunoComponent } from './components/admin/cadastrar-aluno/cada
 import { CadastrarCursoComponent } from './components/admin/cadastrar-curso/cadastrar-curso';
 import { CadastrarProfessorComponent } from './components/admin/cadastrar-professor/cadastrar-professor';
 import { CadastrarDisciplinaComponent } from './components/admin/cadastrar-disciplina/cadastrar-disciplina';
+import { GerenciarProvasComponent } from './components/professor/gerenciar-provas/gerenciar-provas';
+import { AtribuirNotaComponent } from './components/professor/atribuir-nota/atribuir-nota';
+import { FrequenciaComponent } from './components/professor/frequencia/frequencia';
 
 
 export const routes: Routes = [
@@ -18,7 +21,16 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'aluno', component: AlunoComponent },
-  { path: 'professor', component: ProfessorComponent },
+  {
+    path: 'professor',
+    component: ProfessorComponent,
+    children: [
+      { path: 'gerenciar-provas', component: GerenciarProvasComponent },
+      { path: 'atribuir-nota', component: AtribuirNotaComponent },
+      { path: 'frequencia', component: FrequenciaComponent },
+      { path: '', redirectTo: 'gerenciar-provas', pathMatch: 'full' }
+    ]
+  },
   { path: 'home', component: HomeComponent },
   { 
     path: 'admin', 
