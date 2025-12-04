@@ -1,6 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+/**
+ * The component for the Student (Aluno) dashboard.
+ *
+ * @remarks
+ * This component allows students to view their academic information, such as grades, attendance, and exam schedules.
+ * It simulates data retrieval for demonstration purposes.
+ */
 @Component({
   selector: 'app-aluno',
   standalone: true,
@@ -9,9 +16,26 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./aluno.css'],
 })
 export class AlunoComponent {
+  /**
+   * The currently selected discipline/course.
+   */
   disciplinaSelecionada: string = '';
+
+  /**
+   * The data associated with the selected discipline.
+   * Includes attendance, grades, averages, and exam schedules.
+   */
   dados: any = null;
 
+  /**
+   * Displays the details card for a specific discipline.
+   *
+   * @remarks
+   * This method simulates fetching data for the selected discipline by generating random values
+   * for attendance and grades. It updates the `dados` property with this information.
+   *
+   * @param {string} disciplina - The name of the discipline to display.
+   */
   mostrarCard(disciplina: string) {
     this.disciplinaSelecionada = disciplina;
 

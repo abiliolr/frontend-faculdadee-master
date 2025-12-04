@@ -6,6 +6,13 @@ import { AuthService } from '../../services/auth.service'; // Ajuste o caminho s
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+/**
+ * The component for user registration.
+ *
+ * @remarks
+ * This component provides a form for new users to create an account.
+ * It collects user details (login, name, email, password) and uses `AuthService` to register them.
+ */
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -19,19 +26,41 @@ import { FormsModule } from '@angular/forms';
 })
 export class RegisterComponent {
 
+  /**
+   * The registration form data model.
+   * Includes `login`, `usuarioNome`, `email`, and `senha`.
+   */
   form: any = {
     login: '',
     usuarioNome: '',
     email: '',
     senha: ''
   };
+
+  /**
+   * Stores any error message returned during the registration process.
+   */
   errorMessage = '';
 
+  /**
+   * Creates an instance of RegisterComponent.
+   *
+   * @param {AuthService} authService - The service used for authentication and registration.
+   * @param {Router} router - The Angular router used for navigation.
+   */
   constructor(
     private authService: AuthService,
     private router: Router
   ) { }
 
+  /**
+   * Handles the form submission for registration.
+   *
+   * @remarks
+   * Calls the `register` method of `AuthService` with the form data.
+   * If successful, navigates to the login page.
+   * If an error occurs, it parses the error response and displays it.
+   */
   onSubmit(): void {
     // Os nomes dos campos (login, senha, email, usuarioNome)
     // devem bater com o que o DTO/Model do backend espera

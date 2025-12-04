@@ -1,59 +1,93 @@
-# FrontendFaculdade
+# Frontend Faculdade
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.6.
+This project is a frontend application for a university management system, built with **Angular 20**. It allows students, professors, and administrators to interact with the system, managing academic information, courses, and registrations.
 
-## Development server
+## Table of Contents
 
-To start a local development server, run:
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Development Server](#development-server)
+- [Building](#building)
+- [Project Structure](#project-structure)
+- [Documentation](#documentation)
+
+## Features
+
+- **Authentication**: Login and Registration for users.
+- **Student Portal**: View grades, attendance, and exam schedules.
+- **Admin Dashboard**:
+  - Register Students
+  - Register Professors
+  - Register Courses
+  - Register Disciplines
+- **SSR Support**: Server-Side Rendering enabled using Angular Universal/Express.
+
+## Prerequisites
+
+Before you begin, ensure you have met the following requirements:
+
+- **Node.js**: Version 18.19.1 or higher (as per Angular 20 requirements).
+- **npm**: Typically installed with Node.js.
+- **Angular CLI**: Install globally using `npm install -g @angular/cli`.
+
+## Installation
+
+1.  Clone the repository:
+    ```bash
+    git clone <repository-url>
+    cd frontend-faculdade
+    ```
+
+2.  Install the dependencies:
+    ```bash
+    npm install
+    ```
+
+## Development Server
+
+To start the local development server:
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
+Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
 ## Building
 
-To build the project run:
+To build the project for production:
 
 ```bash
 ng build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+The build artifacts will be stored in the `dist/` directory.
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+To build and run the SSR version:
 
 ```bash
-ng test
+npm run build
+npm run serve:ssr:frontend-faculdade
 ```
 
-## Running end-to-end tests
+## Project Structure
 
-For end-to-end (e2e) testing, run:
+The project follows a standard Angular architecture:
 
-```bash
-ng e2e
-```
+-   `src/app/components`: Contains the UI components, organized by feature (admin, aluno, login, etc.).
+-   `src/app/services`: Contains services for data access and business logic (e.g., `AuthService`).
+-   `src/main.ts`: The main entry point for the client-side application.
+-   `src/main.server.ts`: The entry point for the server-side application (SSR).
+-   `src/server.ts`: Express server configuration for SSR.
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Documentation
 
-## Additional Resources
+The codebase is fully documented using JSDoc. You can inspect the source files to see detailed documentation for classes, methods, and properties.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+### Key Components
+
+*   **AppComponent**: The root component.
+*   **AuthService**: Handles login and registration logic.
+*   **AdminComponent**: The main layout for administrative tasks.
+*   **AlunoComponent**: The student dashboard.

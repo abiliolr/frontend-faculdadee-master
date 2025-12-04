@@ -25,7 +25,11 @@ const angularApp = new AngularNodeAppEngine();
  */
 
 /**
- * Serve static files from /browser
+ * Middleware to serve static files from the `/browser` directory.
+ *
+ * @remarks
+ * This middleware serves static assets like images, scripts, and stylesheets.
+ * It is configured with a 1-year max-age cache policy.
  */
 app.use(
   express.static(browserDistFolder, {
@@ -36,7 +40,16 @@ app.use(
 );
 
 /**
- * Handle all other requests by rendering the Angular application.
+ * Middleware to handle all other requests by rendering the Angular application.
+ *
+ * @remarks
+ * This middleware delegates request handling to the `AngularNodeAppEngine`.
+ * If the Angular app produces a response, it is written to the Node response.
+ * Otherwise, the next middleware is called.
+ *
+ * @param {express.Request} req - The Express request object.
+ * @param {express.Response} res - The Express response object.
+ * @param {express.NextFunction} next - The next middleware function.
  */
 app.use((req, res, next) => {
   angularApp
@@ -48,8 +61,11 @@ app.use((req, res, next) => {
 });
 
 /**
- * Start the server if this module is the main entry point, or it is ran via PM2.
- * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
+ * Starts the Express server if this module is the main entry point or running via PM2.
+ *
+ * @remarks
+ * The server listens on the port defined by the `PORT` environment variable,
+ * defaulting to 4000 if not specified.
  */
 if (isMainModule(import.meta.url) || process.env['pm_id']) {
   const port = process.env['PORT'] || 4000;
@@ -64,5 +80,7 @@ if (isMainModule(import.meta.url) || process.env['pm_id']) {
 
 /**
  * Request handler used by the Angular CLI (for dev-server and during build) or Firebase Cloud Functions.
+ *
+ * @type {Function}
  */
 export const reqHandler = createNodeRequestHandler(app);

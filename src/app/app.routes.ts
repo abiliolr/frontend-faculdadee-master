@@ -12,7 +12,16 @@ import { CadastrarCursoComponent } from './components/admin/cadastrar-curso/cada
 import { CadastrarProfessorComponent } from './components/admin/cadastrar-professor/cadastrar-professor';
 import { CadastrarDisciplinaComponent } from './components/admin/cadastrar-disciplina/cadastrar-disciplina';
 
-
+/**
+ * Defines the routes for the application.
+ *
+ * @remarks
+ * This array configures the navigation paths and associates them with their corresponding components.
+ * It includes routes for login, registration, home, student (aluno), professor, and admin dashboards.
+ * The admin route has child routes for managing various entities.
+ *
+ * @type {Routes}
+ */
 export const routes: Routes = [
 
   { path: 'login', component: LoginComponent },

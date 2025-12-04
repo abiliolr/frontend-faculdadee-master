@@ -7,6 +7,13 @@ import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common'; 
 import { FormsModule } from '@angular/forms'; 
 
+/**
+ * The Login component.
+ *
+ * @remarks
+ * This component provides a form for users to authenticate. It uses `AuthService` to validate credentials
+ * and redirects to the home page upon successful login.
+ */
 @Component({
   selector: 'app-login',
   standalone: true, 
@@ -20,18 +27,39 @@ import { FormsModule } from '@angular/forms';
 })
 export class LoginComponent {
 
+  /**
+   * The login form data model.
+   * Includes `username` and `password`.
+   */
   form: any = {
     username: '',
     password: ''
   };
 
+  /**
+   * Stores any error message returned during the login process.
+   */
   errorMessage = '';
 
+  /**
+   * Creates an instance of LoginComponent.
+   *
+   * @param {AuthService} authService - The service used for authentication.
+   * @param {Router} router - The Angular router used for navigation.
+   */
   constructor(
     private authService: AuthService, 
     private router: Router
   ) { }
 
+  /**
+   * Handles the form submission.
+   *
+   * @remarks
+   * Calls the `login` method of `AuthService` with the form data.
+   * If successful, navigates to the '/home' route.
+   * If an error occurs, it parses the error response and sets `errorMessage`.
+   */
   onSubmit(): void {
     this.authService.login(this.form).subscribe({
 
