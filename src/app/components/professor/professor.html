@@ -5,9 +5,9 @@
     </div>
     <nav class="sidebar-nav">
       <ul>
-        <li><a href="#" class="active">Cursos</a></li>
-        <li><a href="#">Disciplinas</a></li>
-        <li><a href="#">Notas</a></li>
+        <li><a routerLink="gerenciar-provas" routerLinkActive="active">Gerenciar Provas</a></li>
+        <li><a routerLink="atribuir-nota" routerLinkActive="active">Atribuir Nota</a></li>
+        <li><a routerLink="frequencia" routerLinkActive="active">Frequência</a></li>
       </ul>
     </nav>
 
@@ -15,8 +15,7 @@
   </div>
 
   <div class="container-aluno">
-    <h1 class="titulo-bemvindo">Bem-vindo ao Painel do Professor!</h1>
-    <p class="mensagem-bemvindo">
-      <b>teste teste teste teste teste teste</b><br />
-      <br />
-    </p>
+    <!-- Adicionando o router-outlet para renderizar os componentes filhos -->
+    <router-outlet></router-outlet>
+  </div>
+</div>
