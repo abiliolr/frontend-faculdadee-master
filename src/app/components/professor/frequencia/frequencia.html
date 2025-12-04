@@ -1,0 +1,56 @@
+<div class="table-container">
+    <h2>Registro de Frequência</h2>
+
+    <!-- Seleção de Disciplina -->
+    <div class="filter-section" style="margin-bottom: 20px;">
+        <label for="disciplinaSelect">Selecione a Disciplina: </label>
+        <select id="disciplinaSelect" [(ngModel)]="disciplinaSelecionadaId" (change)="onDisciplinaChange()">
+            <option value="" disabled selected>Escolha...</option>
+            <option *ngFor="let d of disciplinas" [value]="d.id">{{ d.nome }}</option>
+        </select>
+    </div>
+
+    <div *ngIf="alunos.length > 0; else noData">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome do Aluno</th>
+                    <th>Status</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let aluno of alunos">
+                    <td>{{ aluno.nome }}</td>
+                    <td>
+                        <span [class.status-presente]="aluno.presente" [class.status-falta]="!aluno.presente">
+                            {{ aluno.presente ? 'Presente' : 'Falta' }}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn-toggle" (click)="toggleStatus(aluno)">
+                            Alternar
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Botão de Salvar -->
+        <div class="actions" style="margin-top: 20px; text-align: right;">
+            <button class="btn-save" (click)="salvarFrequencia()">Salvar Chamada</button>
+        </div>
+    </div>
+
+    <ng-template #noData>
+        <p *ngIf="disciplinaSelecionadaId">Nenhum aluno encontrado nesta disciplina.</p>
+        <p *ngIf="!disciplinaSelecionadaId">Por favor, selecione uma disciplina para carregar a lista.</p>
+    </ng-template>
+
+    <div *ngIf="successMessage" class="success-message" style="margin-top: 15px; color: green; background: #e0ffe0; padding: 10px;">
+        {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage" class="error-message" style="margin-top: 15px; color: red; background: #ffe0e0; padding: 10px;">
+        {{ errorMessage }}
+    </div>
+</div>

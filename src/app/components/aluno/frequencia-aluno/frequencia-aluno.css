@@ -1,0 +1,122 @@
+.card-container {
+    width: 100%;
+    max-width: 1000px;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+h2 {
+    color: #143c69;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.frequencia-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header {
+    background: #f7f8fa;
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.badge-aulas {
+    background: #e3f2fd;
+    color: #1565c0;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.valor {
+    font-weight: bold;
+}
+
+.verde { color: #2e7d32; }
+.vermelho { color: #c62828; }
+
+.progress-bar-container {
+    height: 10px;
+    background: #e0e0e0;
+    border-radius: 5px;
+    margin-top: 15px;
+    margin-bottom: 8px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: #2e7d32; /* Verde padrão */
+    transition: width 0.5s ease-in-out;
+}
+
+.progress-bar.danger {
+    background: #c62828; /* Vermelho se < 75% */
+}
+
+.percentual-text {
+    text-align: right;
+    font-size: 12px;
+    color: #666;
+    margin: 0;
+}
+
+.card-footer {
+    padding: 15px 20px;
+    background: #fafafa;
+    border-top: 1px solid #eee;
+    text-align: center;
+}
+
+.card-footer p {
+    margin: 0 0 5px;
+    font-size: 14px;
+    color: #555;
+}
+
+.card-footer strong {
+    font-size: 18px;
+    color: #143c69;
+}
+
+.reprovado-texto {
+    color: #c62828 !important;
+    font-size: 16px !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

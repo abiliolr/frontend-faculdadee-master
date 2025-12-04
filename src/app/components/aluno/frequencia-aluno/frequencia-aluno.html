@@ -1,0 +1,37 @@
+<div class="card-container">
+    <h2>Controle de Frequência</h2>
+    <div class="cards-grid">
+        <div class="frequencia-card" *ngFor="let d of disciplinas">
+            <div class="card-header">
+                <h3>{{ d.nome }}</h3>
+                <span class="badge-aulas">{{ d.aulasDadas }} Aulas</span>
+            </div>
+
+            <div class="card-body">
+                <div class="stat-row">
+                    <span>Presenças:</span>
+                    <span class="valor verde">{{ d.presencas }}</span>
+                </div>
+                <div class="stat-row">
+                    <span>Faltas:</span>
+                    <span class="valor vermelho">{{ d.faltas }}</span>
+                </div>
+
+                <div class="progress-bar-container">
+                    <div class="progress-bar"
+                         [style.width.%]="calcularPorcentagemFrequencia(d)"
+                         [class.danger]="calcularPorcentagemFrequencia(d) < 75">
+                    </div>
+                </div>
+                <p class="percentual-text">{{ calcularPorcentagemFrequencia(d) | number:'1.0-1' }}% de Frequência</p>
+            </div>
+
+            <div class="card-footer">
+                <p>Faltas Restantes Permitidas:</p>
+                <strong [class.reprovado-texto]="calcularFaltasRestantes(d) === 'Reprovado por Faltas'">
+                    {{ calcularFaltasRestantes(d) }}
+                </strong>
+            </div>
+        </div>
+    </div>
+</div>

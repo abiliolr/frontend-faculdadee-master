@@ -1,0 +1,42 @@
+<div class="form-container">
+    <h2>Agendar Prova</h2>
+    <form (ngSubmit)="onSubmit()" #provaForm="ngForm">
+        <div class="form-group">
+            <label for="disciplina">Disciplina:</label>
+            <!-- Mudei [value]="disciplina" para [value]="disciplina.id" e adicionei (change) -->
+            <select id="disciplina" name="disciplina" [(ngModel)]="form.disciplinaId" (change)="onDisciplinaChange()" required>
+                <option value="" disabled selected>Selecione a disciplina</option>
+                <option *ngFor="let disciplina of disciplinas" [value]="disciplina.id">{{ disciplina.nome }}</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="nomeProva">Nome da Prova:</label>
+            <input type="text" id="nomeProva" name="nomeProva" [(ngModel)]="form.nomeProva" required placeholder="Ex: Prova 1, Exame Final">
+        </div>
+        <div class="form-group">
+            <label for="data">Data:</label>
+            <input type="date" id="data" name="data" [(ngModel)]="form.data" required>
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="Agendar Prova" [disabled]="!provaForm.form.valid">
+        </div>
+
+        <div *ngIf="successMessage" class="success-message">
+            {{ successMessage }}
+        </div>
+        <div *ngIf="errorMessage" class="error-message">
+            {{ errorMessage }}
+        </div>
+    </form>
+
+    <!-- Lista de provas existentes (Feedback visual extra) -->
+    <div *ngIf="provas.length > 0" class="provas-list">
+        <h3>Provas Agendadas</h3>
+        <ul>
+            <li *ngFor="let p of provas">
+                <strong>{{ p.nome }}</strong> - {{ p.data | date:'dd/MM/yyyy' }}
+            </li>
+        </ul>
+    </div>
+</div>
