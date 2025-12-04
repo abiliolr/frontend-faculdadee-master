@@ -1,0 +1,41 @@
+<div class="card-container">
+    <h2>Boletim Escolar</h2>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Disciplina</th>
+                    <th>1º Bimestre</th>
+                    <th>2º Bimestre</th>
+                    <th>Média</th>
+                    <th>Situação</th>
+                    <th>Nota Necessária (2º Bim)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let d of disciplinas">
+                    <td>{{ d.nome }}</td>
+                    <td>{{ d.nota1 }}</td>
+                    <td>{{ d.nota2 !== null ? d.nota2 : '-' }}</td>
+                    <td>{{ calcularMedia(d) }}</td>
+                    <td>
+                        <span [class.aprovado]="calcularSituacao(d) === 'Aprovado'"
+                              [class.cursando]="calcularSituacao(d) === 'Cursando'"
+                              [class.reprovado]="calcularSituacao(d) === 'Prova Final'">
+                            {{ calcularSituacao(d) }}
+                        </span>
+                    </td>
+                    <td>
+                         <!-- Só mostra se estiver cursando (sem nota 2) -->
+                         <span *ngIf="d.nota2 === null" class="destaque-necessaria">
+                            {{ calcularNotaNecessaria(d) }}
+                         </span>
+                         <span *ngIf="d.nota2 !== null">
+                            -
+                         </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

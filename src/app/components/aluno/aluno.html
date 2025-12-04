@@ -5,9 +5,9 @@
     </div>
     <nav class="sidebar-nav">
       <ul>
-        <li><a href="#" class="active">Curso</a></li>
-        <li><a href="#">Disciplinas</a></li>
-        <li><a href="#">Notas</a></li>
+        <li><a routerLink="boletim" routerLinkActive="active">Boletim / Notas</a></li>
+        <li><a routerLink="frequencia" routerLinkActive="active">Frequência</a></li>
+        <li><a routerLink="provas" routerLinkActive="active">Calendário de Provas</a></li>
       </ul>
     </nav>
 
@@ -15,49 +15,6 @@
   </div>
 
   <div class="container-aluno">
-    <h1 class="titulo-bemvindo">Bem-vindo ao Painel do Aluno!</h1>
-    <p class="mensagem-bemvindo">
-      <b>Aqui você acompanha seu desempenho em cada disciplina.</b><br />
-      <b>Selecione uma matéria e veja seu andamento</b>
-      <br />
-    </p>
-
-    <div class="disciplinas">
-      <button class="btn-disciplina" (click)="mostrarCard('Arquitetura de Computadores')">
-        Arquitetura de Computadores
-      </button>
-      <button class="btn-disciplina" (click)="mostrarCard('Programação Orientada a Objetos')">
-        Programação Orientada a Objetos
-      </button>
-      <button class="btn-disciplina" (click)="mostrarCard('Banco de Dados')">
-        Banco de Dados
-      </button>
-    </div>
-
-   <div class="card" *ngIf="dados">
-  <h2>{{ dados.disciplina }}</h2>
-
-  <div class="info-grid">
-    <div class="info-bloco notas">
-      <h3>Notas</h3>
-      <p><strong>1º Bimestre:</strong> {{ dados.nota1 }}</p>
-      <p><strong>2º Bimestre:</strong> {{ dados.nota2 }}</p>
-      <p><strong>Média Atual:</strong> {{ dados.media }}</p>
-      <p><strong>Nota Necessária:</strong> {{ dados.notaNecessaria }}</p>
-    </div>
-
-    <div class="info-bloco faltas">
-      <h3>Faltas</h3>
-      <p><strong>Faltas:</strong> {{ dados.faltas }}</p>
-      <p><strong>Restantes:</strong> {{ dados.faltasRestantes }}</p>
-      <p><strong>Presenças:</strong> {{ dados.presencas }}</p>
-    </div>
-
-    <div class="info-bloco provas">
-      <h3>Provas Marcadas</h3>
-      <ul>
-        <li *ngFor="let prova of dados.horariosProvas">{{ prova }}</li>
-      </ul>
-    </div>
+    <router-outlet></router-outlet>
   </div>
 </div>

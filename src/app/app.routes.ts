@@ -14,12 +14,25 @@ import { CadastrarDisciplinaComponent } from './components/admin/cadastrar-disci
 import { GerenciarProvasComponent } from './components/professor/gerenciar-provas/gerenciar-provas';
 import { AtribuirNotaComponent } from './components/professor/atribuir-nota/atribuir-nota';
 import { FrequenciaComponent } from './components/professor/frequencia/frequencia';
+import { BoletimAlunoComponent } from './components/aluno/boletim-aluno/boletim-aluno';
+import { FrequenciaAlunoComponent } from './components/aluno/frequencia-aluno/frequencia-aluno';
+import { CalendarioProvasComponent } from './components/aluno/calendario-provas/calendario-provas';
 
 
 export const routes: Routes = [
 
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  {
+    path: 'aluno',
+    component: AlunoComponent,
+    children: [
+        { path: 'boletim', component: BoletimAlunoComponent },
+        { path: 'frequencia', component: FrequenciaAlunoComponent },
+        { path: 'provas', component: CalendarioProvasComponent },
+        { path: '', redirectTo: 'boletim', pathMatch: 'full' }
+    ]
+  },
   { path: 'aluno', component: AlunoComponent },
   {
     path: 'professor',
