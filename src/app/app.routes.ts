@@ -33,6 +33,7 @@ export const routes: Routes = [
         { path: '', redirectTo: 'boletim', pathMatch: 'full' }
     ]
   },
+  { path: 'aluno', component: AlunoComponent },
   {
     path: 'professor',
     component: ProfessorComponent,
