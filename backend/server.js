@@ -362,6 +362,12 @@ app.delete('/api/disciplinas/:id', authenticate, async (req, res) => {
 app.delete('/api/users/:id', authenticate, async (req, res) => {
     const rawId = req.params.id; // Keep raw string for debug and backup comparison
     const id = parseInt(rawId, 10);
+    
+    // Validate that id is a valid number
+    if (isNaN(id)) {
+        return res.status(400).json({ message: 'ID inválido' });
+    }
+    
     console.log(`Deleting user with ID param: ${rawId} (parsed: ${id})`);
 
     await db.read();
