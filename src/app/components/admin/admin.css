@@ -28,7 +28,7 @@ p {
 
 .sidebar {
     width: 250px;
-    background: #242627;
+    background: #1565c0; /* Azul acadêmico */
     color: #fff;
     position: fixed;
     height: 100%;
@@ -66,7 +66,7 @@ p {
 }
 
 .sidebar-nav a {
-    color: #ccc;
+    color: #e3f2fd; /* Azul claro para contraste */
     text-decoration: none;
     font-size: 18px;
     display: block;
@@ -76,8 +76,8 @@ p {
 }
 
 .sidebar-nav a:hover,
-.sidebar-nav a.active { /* .active é aplicado pelo routerLinkActive */
-    background: #000000;
+.sidebar-nav a.active {
+    background: #0d47a1; /* Azul mais escuro no hover/active */
     color: #fff;
 }
 
