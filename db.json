@@ -1,0 +1,67 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "123",
+      "role": "admin",
+      "name": "Administrador do Sistema"
+    },
+    {
+      "id": 2,
+      "username": "prof",
+      "password": "123",
+      "role": "professor",
+      "name": "Prof. Girafales"
+    },
+    {
+      "id": 3,
+      "username": "aluno",
+      "password": "123",
+      "role": "student",
+      "name": "Roberto Bolaños"
+    }
+  ],
+  "subjects": [
+    {
+      "id": 101,
+      "name": "Matemática",
+      "professorId": 2
+    },
+    {
+      "id": 102,
+      "name": "Português",
+      "professorId": 2
+    }
+  ],
+  "grades": [
+    {
+      "id": 1,
+      "studentId": 3,
+      "subjectId": 101,
+      "value": 8.5
+    },
+    {
+      "id": 2,
+      "studentId": 3,
+      "subjectId": 102,
+      "value": 6
+    }
+  ],
+  "attendance": [
+    {
+      "id": 1,
+      "studentId": 3,
+      "subjectId": 101,
+      "absences": 2,
+      "totalClasses": 40
+    },
+    {
+      "id": 2,
+      "studentId": 3,
+      "subjectId": 102,
+      "absences": 0,
+      "totalClasses": 40
+    }
+  ]
+}
