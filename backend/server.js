@@ -33,6 +33,8 @@ const defaultData = {
   users: [],
   subjects: [],
   grades: [],
+  attendance: [],
+  exams: [] // Novo recurso
   attendance: []
 };
 
@@ -42,6 +44,10 @@ const db = await JSONFilePreset('db.json', defaultData);
 // --- SEED (Dados Iniciais) ---
 async function seedDatabase() {
   await db.read();
+
+  // Migration: Garantir que arrays novos existam se o banco já foi criado
+  db.data.exams ||= [];
+  await db.write();
 
   if (db.data.users.length === 0) {
     console.log('Banco vazio. Criando dados iniciais...');
@@ -61,6 +67,8 @@ async function seedDatabase() {
 
     // 3. Notas (Ligadas ao Aluno e Disciplina)
     db.data.grades.push(
+      { id: 1, studentId: 3, subjectId: 101, nota1: 8.5, nota2: null },
+      { id: 2, studentId: 3, subjectId: 102, nota1: 6.0, nota2: 7.0 }
       { id: 1, studentId: 3, subjectId: 101, value: 8.5 },
       { id: 2, studentId: 3, subjectId: 102, value: 6.0 }
     );
@@ -205,6 +213,9 @@ app.get('/api/alunos/:id/boletim', authenticate, async (req, res) => {
     if (grade) {
       return {
         ...grade,
+        // BACKWARDS COMPATIBILITY: Map old 'value' to 'nota1' if exists
+        nota1: grade.nota1 !== undefined ? grade.nota1 : (grade.value !== undefined ? grade.value : null),
+        nota2: grade.nota2 !== undefined ? grade.nota2 : null,
         subjectName: subject.name
       };
     } else {
@@ -213,6 +224,8 @@ app.get('/api/alunos/:id/boletim', authenticate, async (req, res) => {
         id: null,
         studentId: studentId,
         subjectId: subject.id,
+        nota1: null,
+        nota2: null,
         value: null, // Indica sem nota
         subjectName: subject.name
       };
@@ -287,6 +300,9 @@ app.get('/api/professores/:id/disciplinas', authenticate, async (req, res) => {
   await db.read();
 
   // Se for ID 2 (Professor Mock), retorna as dele.
+  // Se for outro professor, retorna apenas as dele.
+  let subjects = db.data.subjects.filter(s => s.professorId === professorId);
+
   // Se for outro professor (criado depois), retorna vazio ou todas para teste?
   // Vamos assumir que novos professores veem todas as disciplinas por enquanto (simplificação)
   // ou criar disciplinas padrão para eles.
@@ -308,6 +324,27 @@ app.get('/api/professores', authenticate, async (req, res) => {
   res.json(professors);
 });
 
+// Lançar Nota (Atualizado para Nota 1 e Nota 2)
+app.post('/api/notas', authenticate, async (req, res) => {
+  const { studentId, subjectId, nota1, nota2 } = req.body;
+
+  // Basic validation (optional, frontend handles range)
+
+  await db.read();
+
+  const existingGradeIndex = db.data.grades.findIndex(g => g.studentId === studentId && g.subjectId === subjectId);
+
+  if (existingGradeIndex >= 0) {
+      // Update existing grade
+      const existing = db.data.grades[existingGradeIndex];
+      // Only update if provided (allows partial updates)
+      if (nota1 !== undefined && nota1 !== null) existing.nota1 = nota1;
+      if (nota2 !== undefined && nota2 !== null) existing.nota2 = nota2;
+
+      await db.write();
+      return res.status(200).json(existing);
+  } else {
+      // Create new grade record
   const subjects = db.data.subjects.filter(s => s.professorId === professorId);
   res.json(subjects);
 });
@@ -337,6 +374,8 @@ app.post('/api/notas', authenticate, async (req, res) => {
         id: Date.now(),
         studentId,
         subjectId,
+        nota1: nota1 !== undefined ? nota1 : null,
+        nota2: nota2 !== undefined ? nota2 : null
         value
       };
       db.data.grades.push(newGrade);
@@ -384,6 +423,7 @@ app.post('/api/disciplinas', authenticate, async (req, res) => {
     res.status(201).json(newSubject);
 });
 
+// Deletar Disciplina (Atualizado para Cascade Delete)
 // Deletar Disciplina
 app.delete('/api/disciplinas/:id', authenticate, async (req, res) => {
     const id = parseInt(req.params.id);
@@ -393,6 +433,17 @@ app.delete('/api/disciplinas/:id', authenticate, async (req, res) => {
     db.data.subjects = db.data.subjects.filter(s => s.id !== id);
 
     if (db.data.subjects.length < initialLength) {
+        // Cascade Delete: Remove Exams, Grades, Attendance associated with this subject
+        if (db.data.exams) {
+            db.data.exams = db.data.exams.filter(e => e.subjectId !== id);
+        }
+        if (db.data.grades) {
+            db.data.grades = db.data.grades.filter(g => g.subjectId !== id);
+        }
+        if (db.data.attendance) {
+            db.data.attendance = db.data.attendance.filter(a => a.subjectId !== id);
+        }
+
         await db.write();
         res.json({ message: 'Disciplina removida' });
     } else {
@@ -410,6 +461,10 @@ app.delete('/api/users/:id', authenticate, async (req, res) => {
 
     const initialLength = db.data.users.length;
 
+    if (id === 1 || rawId === '1') {
+        return res.status(403).json({ message: 'Não é possível deletar o administrador principal' });
+    }
+
     // Check if ID 1 (Admin) is being targeted
     // Check both number 1 and string "1"
     if (id === 1 || rawId === '1') {
@@ -422,6 +477,84 @@ app.delete('/api/users/:id', authenticate, async (req, res) => {
 
     if (db.data.users.length < initialLength) {
         await db.write();
+        res.json({ message: 'Usuário removido' });
+    } else {
+        res.status(404).json({ message: 'Usuário não encontrado' });
+    }
+});
+
+// --- PROVAS (CALENDÁRIO) ---
+
+// Listar todas as provas (para Aluno e Professor verem)
+// Atualizado para remover "Fantasmas"
+app.get('/api/provas', authenticate, async (req, res) => {
+  await db.read();
+
+  // Enriquecer com o nome da disciplina, filtrando as inválidas
+  const exams = db.data.exams.reduce((acc, e) => {
+      const subject = db.data.subjects.find(s => s.id === e.subjectId);
+      if (subject) {
+          acc.push({
+              ...e,
+              subjectName: subject.name
+          });
+      } else {
+          // Ghost exam (subject deleted but exam remained).
+          // We filter it out from the response so the user sees a "clean" list.
+          // Optionally we could delete it from DB here, but filtering is safer for read-only.
+      }
+      return acc;
+  }, []);
+
+  res.json(exams);
+});
+
+// Agendar Prova (Professor)
+app.post('/api/provas', authenticate, async (req, res) => {
+  const { subjectId, name, date, time } = req.body;
+
+  if (!subjectId || !name || !date || !time) {
+      return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
+  }
+
+  await db.read();
+
+  // Migration check in runtime just in case
+  db.data.exams ||= [];
+
+  const newExam = {
+      id: Date.now(),
+      subjectId: parseInt(subjectId),
+      name,
+      date,
+      time
+  };
+
+  db.data.exams.push(newExam);
+  await db.write();
+
+  res.status(201).json(newExam);
+});
+
+// Deletar Prova
+app.delete('/api/provas/:id', authenticate, async (req, res) => {
+    const id = parseInt(req.params.id);
+    await db.read();
+
+    // Check if exams array exists
+    if (!db.data.exams) {
+        return res.status(404).json({ message: 'Prova não encontrada' });
+    }
+
+    const initialLength = db.data.exams.length;
+    db.data.exams = db.data.exams.filter(e => e.id !== id);
+
+    if (db.data.exams.length < initialLength) {
+        await db.write();
+        res.json({ message: 'Prova removida com sucesso' });
+    } else {
+        res.status(404).json({ message: 'Prova não encontrada' });
+    }
         console.log(`User ${rawId} deleted successfully`);
         res.json({ message: 'Usuário removido' });
     } else {

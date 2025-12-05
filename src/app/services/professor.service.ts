@@ -25,6 +25,18 @@ export class ProfessorService {
     return this.http.get<any[]>(`${this.apiUrl}/alunos`, httpOptions);
   }
 
+  // Updated to support new payload structure if strictly typed, but 'any' covers it.
+  lancarNota(notaData: { studentId: number; subjectId: number; nota1?: number | null; nota2?: number | null }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/notas`, notaData, httpOptions);
+  }
+
+  agendarProva(provaData: { subjectId: number; name: string; date: string; time: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/provas`, provaData, httpOptions);
+  }
+
+  deleteProva(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/provas/${id}`, httpOptions);
+  }
   lancarNota(notaData: { studentId: number; subjectId: number; value: number }): Observable<any> {
     return this.http.post(`${this.apiUrl}/notas`, notaData, httpOptions);
   }

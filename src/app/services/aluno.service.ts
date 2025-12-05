@@ -24,6 +24,10 @@ export class AlunoService {
 
   getFrequencia(studentId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/alunos/${studentId}/frequencia`, httpOptions);
+  }
+
+  getProvas(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/provas`, httpOptions);
     return this.http.get<any[]>(`${this.apiUrl}/${studentId}/boletim`, httpOptions);
   }
 

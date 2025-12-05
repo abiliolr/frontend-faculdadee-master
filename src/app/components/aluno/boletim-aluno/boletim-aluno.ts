@@ -30,6 +30,10 @@ export class BoletimAlunoComponent implements OnInit {
     if (this.studentId) {
         this.alunoService.getBoletim(this.studentId).subscribe({
         next: (data: any[]) => {
+            this.disciplinas = data.map((d: any) => ({
+                nome: d.subjectName,
+                nota1: d.nota1,
+                nota2: d.nota2
             // Adapt backend data to UI expectation
             this.disciplinas = data.map((d: any) => ({
             nome: d.subjectName,
@@ -47,22 +51,34 @@ export class BoletimAlunoComponent implements OnInit {
   calcularMedia(d: any): string {
     if (d.nota1 === null) return '-';
     if (d.nota2 === null) return Number(d.nota1).toFixed(1);
+    const n1 = Number(d.nota1);
+    const n2 = Number(d.nota2);
+    return ((n1 + n2) / 2).toFixed(1);
     return ((d.nota1 + d.nota2) / 2).toFixed(1);
   }
 
   calcularSituacao(d: any): string {
     if (d.nota1 === null) return 'Não avaliado';
     if (d.nota2 === null) return 'Cursando';
-    const media = (d.nota1 + d.nota2) / 2;
-    return media >= this.mediaAprovacao ? 'Aprovado' : 'Prova Final';
+
+    const n1 = Number(d.nota1);
+    const n2 = Number(d.nota2);
+    const media = (n1 + n2) / 2;
+
+    // Updated logic per request: If both grades present and < 7, status is Reprovado
+    return media >= this.mediaAprovacao ? 'Aprovado' : 'Reprovado';
   }
 
   calcularNotaNecessaria(d: any): string {
     if (d.nota1 === null) return '-';
     if (d.nota2 !== null) {
-      const media = (d.nota1 + d.nota2) / 2;
-      return media >= this.mediaAprovacao ? 'Aprovado' : 'Recuperação';
+      const n1 = Number(d.nota1);
+      const n2 = Number(d.nota2);
+      const media = (n1 + n2) / 2;
+      return media >= this.mediaAprovacao ? 'Aprovado' : 'Reprovado';
     }
+    const n1 = Number(d.nota1);
+    const necessaria = (this.mediaAprovacao * 2) - n1;
     const necessaria = (this.mediaAprovacao * 2) - d.nota1;
     if (necessaria <= 0) return '0.0';
     if (necessaria > 10) return 'Impossível (PF)';
