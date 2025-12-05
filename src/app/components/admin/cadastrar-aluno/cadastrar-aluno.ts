@@ -1,40 +1,72 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // 1. IMPORTAR FormsModule
-import { AuthService } from '../../../services/auth.service'; // 2. IMPORTAR AuthService (ou AdminService)
+import { FormsModule } from '@angular/forms';
+import { AdminService } from '../../../services/admin.service';
 
 @Component({
   selector: 'app-cadastrar-aluno',
   standalone: true,
-  imports: [CommonModule, FormsModule], // 3. ADICIONAR FormsModule
+  imports: [CommonModule, FormsModule],
   templateUrl: './cadastrar-aluno.html',
   styleUrls: ['./cadastrar-aluno.css']
 })
-export class CadastrarAlunoComponent { // 4. RENOMEADO de CadastrarAluno para CadastrarAlunoComponent
-  
-  // 5. Lógica do formulário (baseado no register.ts)
+export class CadastrarAlunoComponent implements OnInit {
+  alunos: any[] = [];
   form: any = {
-    matricula: '',
-    nome: '',
-    curso: '',
-    email: ''
+    name: '',
+    username: '',
+    password: '',
+    email: '',
+    role: 'student'
   };
-  errorMessage = '';
+
   successMessage = '';
+  errorMessage = '';
 
-  constructor(private authService: AuthService) { } // 6. INJETAR serviço
+  constructor(private adminService: AdminService) {}
 
-  // 7. Método onSubmit
+  ngOnInit(): void {
+    this.loadAlunos();
+  }
+
+  loadAlunos(): void {
+    this.adminService.getAlunos().subscribe({
+      next: (data) => this.alunos = data,
+      error: (err) => console.error('Erro ao carregar alunos', err)
+    });
+  }
+
   onSubmit(): void {
-    this.errorMessage = '';
     this.successMessage = '';
-    console.log('Salvando Aluno:', this.form);
+    this.errorMessage = '';
 
-    // No futuro, você chamará seu serviço de backend aqui
-    // this.authService.cadastrarAluno(this.form).subscribe({ ... });
+    // Backend expects { username, password, name, role } or { login, ... }
+    const payload = { ...this.form };
 
-    // Simulação de sucesso
-    this.successMessage = 'Aluno cadastrado com sucesso! (Simulação)';
-    this.form = { matricula: '', nome: '', curso: '', email: '' }; // Limpa o formulário
+    this.adminService.createUser(payload).subscribe({
+      next: (res) => {
+        this.successMessage = 'Aluno cadastrado com sucesso!';
+        this.form = { name: '', username: '', password: '', email: '', role: 'student' };
+        this.loadAlunos();
+      },
+      error: (err) => {
+        console.error(err);
+        this.errorMessage = err.error?.message || 'Erro ao cadastrar aluno';
+      }
+    });
+  }
+
+  deleteAluno(id: number): void {
+    if (confirm('Tem certeza que deseja remover este aluno?')) {
+      this.adminService.deleteUser(id).subscribe({
+        next: () => this.loadAlunos(),
+        error: (err: any) => {
+            console.error('Delete error:', err);
+            // Show specific error message from backend if available
+            const msg = err.error?.message || err.message || 'Erro desconhecido';
+            alert(`Erro ao remover aluno: ${msg}`);
+        }
+      });
+    }
   }
 }
