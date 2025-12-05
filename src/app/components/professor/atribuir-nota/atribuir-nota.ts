@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ProfessorService } from '../../../services/professor.service';
 
 @Component({
   selector: 'app-atribuir-nota',
@@ -9,18 +10,39 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './atribuir-nota.html',
   styleUrls: ['./atribuir-nota.css']
 })
-export class AtribuirNotaComponent {
-  disciplinas = ['Web II', 'Banco de Dados', 'Engenharia de Software', 'Algoritmos'];
-  alunos = ['João Silva', 'Maria Souza', 'Pedro Oliveira', 'Ana Costa'];
+export class AtribuirNotaComponent implements OnInit {
+  disciplinas: any[] = [];
+  alunos: any[] = [];
 
   form: any = {
-    aluno: '',
-    disciplina: '',
+    aluno: '', // This will hold the ID now
+    disciplina: '', // This will hold the ID now
     nota: null
   };
 
   successMessage = '';
   errorMessage = '';
+
+  // TODO: Get real professor ID from Auth
+  professorId = 2;
+
+  constructor(private professorService: ProfessorService) {}
+
+  ngOnInit(): void {
+    this.carregarDados();
+  }
+
+  carregarDados(): void {
+    this.professorService.getDisciplinas(this.professorId).subscribe({
+      next: (data: any[]) => this.disciplinas = data,
+      error: (err: any) => console.error('Erro ao carregar disciplinas', err)
+    });
+
+    this.professorService.listarAlunos().subscribe({
+      next: (data: any[]) => this.alunos = data,
+      error: (err: any) => console.error('Erro ao carregar alunos', err)
+    });
+  }
 
   onSubmit(): void {
     this.successMessage = '';
@@ -31,12 +53,25 @@ export class AtribuirNotaComponent {
       return;
     }
 
-    console.log('Lançando Nota:', this.form);
+    const payload = {
+      studentId: parseInt(this.form.aluno),
+      subjectId: parseInt(this.form.disciplina),
+      value: this.form.nota
+    };
 
-    alert(`Nota ${this.form.nota} atribuída ao aluno(a) ${this.form.aluno} na disciplina ${this.form.disciplina}!`);
-    this.successMessage = 'Nota lançada com sucesso!';
+    this.professorService.lancarNota(payload).subscribe({
+      next: (res: any) => {
+        const alunoNome = this.alunos.find(a => a.id === payload.studentId)?.name;
+        const discNome = this.disciplinas.find(d => d.id === payload.subjectId)?.name;
 
-    // Reset form
-    this.form = { aluno: '', disciplina: '', nota: null };
+        alert(`Nota ${this.form.nota} atribuída ao aluno(a) ${alunoNome} na disciplina ${discNome}!`);
+        this.successMessage = 'Nota lançada com sucesso!';
+        this.form = { aluno: '', disciplina: '', nota: null };
+      },
+      error: (err: any) => {
+        console.error('Erro ao lançar nota', err);
+        this.errorMessage = 'Erro ao salvar a nota. Tente novamente.';
+      }
+    });
   }
 }
