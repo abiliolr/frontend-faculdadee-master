@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ProfessorService } from '../../../services/professor.service';
 
 @Component({
   selector: 'app-atribuir-nota',
@@ -9,34 +10,84 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './atribuir-nota.html',
   styleUrls: ['./atribuir-nota.css']
 })
-export class AtribuirNotaComponent {
-  disciplinas = ['Web II', 'Banco de Dados', 'Engenharia de Software', 'Algoritmos'];
-  alunos = ['João Silva', 'Maria Souza', 'Pedro Oliveira', 'Ana Costa'];
+export class AtribuirNotaComponent implements OnInit {
+  disciplinas: any[] = [];
+  alunos: any[] = [];
 
   form: any = {
     aluno: '',
     disciplina: '',
-    nota: null
+    nota1: null,
+    nota2: null
   };
 
   successMessage = '';
   errorMessage = '';
 
+  professorId: number | null = null;
+
+  constructor(private professorService: ProfessorService) {}
+
+  ngOnInit(): void {
+    if (typeof localStorage !== 'undefined') {
+        const userInfoStr = localStorage.getItem('user_info');
+        if (userInfoStr) {
+            const userInfo = JSON.parse(userInfoStr);
+            this.professorId = userInfo.id;
+        }
+    }
+
+    this.carregarDados();
+  }
+
+  carregarDados(): void {
+    if (this.professorId) {
+        this.professorService.getDisciplinas(this.professorId).subscribe({
+        next: (data: any[]) => this.disciplinas = data,
+        error: (err: any) => console.error('Erro ao carregar disciplinas', err)
+        });
+    }
+
+    this.professorService.listarAlunos().subscribe({
+      next: (data: any[]) => this.alunos = data,
+      error: (err: any) => console.error('Erro ao carregar alunos', err)
+    });
+  }
+
   onSubmit(): void {
     this.successMessage = '';
     this.errorMessage = '';
 
-    if (this.form.nota < 0 || this.form.nota > 10) {
-      this.errorMessage = 'A nota deve estar entre 0 e 10.';
-      return;
+    // Validate grades
+    if (this.form.nota1 !== null && (this.form.nota1 < 0 || this.form.nota1 > 10)) {
+        this.errorMessage = 'A Nota 1 deve estar entre 0 e 10.';
+        return;
+    }
+    if (this.form.nota2 !== null && (this.form.nota2 < 0 || this.form.nota2 > 10)) {
+        this.errorMessage = 'A Nota 2 deve estar entre 0 e 10.';
+        return;
     }
 
-    console.log('Lançando Nota:', this.form);
+    const payload = {
+      studentId: parseInt(this.form.aluno),
+      subjectId: parseInt(this.form.disciplina),
+      nota1: this.form.nota1,
+      nota2: this.form.nota2
+    };
 
-    alert(`Nota ${this.form.nota} atribuída ao aluno(a) ${this.form.aluno} na disciplina ${this.form.disciplina}!`);
-    this.successMessage = 'Nota lançada com sucesso!';
+    this.professorService.lancarNota(payload).subscribe({
+      next: (res: any) => {
+        const alunoNome = this.alunos.find(a => a.id === payload.studentId)?.name;
+        const discNome = this.disciplinas.find(d => d.id === payload.subjectId)?.name;
 
-    // Reset form
-    this.form = { aluno: '', disciplina: '', nota: null };
+        alert(`Notas atualizadas para ${alunoNome} na disciplina ${discNome}!`);
+        this.successMessage = 'Notas lançadas com sucesso!';
+        this.form = { aluno: '', disciplina: '', nota1: null, nota2: null };
+      },
+      error: (err: any) => {
+        console.error('Erro ao lançar nota', err);
+        this.errorMessage = 'Erro ao salvar a nota. Tente novamente.';
+      }
+    });
   }
 }

@@ -5,23 +5,32 @@
             <label for="aluno">Aluno:</label>
             <select id="aluno" name="aluno" [(ngModel)]="form.aluno" required>
                 <option value="" disabled selected>Selecione o aluno</option>
-                <option *ngFor="let aluno of alunos" [value]="aluno">{{ aluno }}</option>
+                <option *ngFor="let aluno of alunos" [value]="aluno.id">{{ aluno.name }}</option>
             </select>
         </div>
         <div class="form-group">
             <label for="disciplina">Disciplina:</label>
             <select id="disciplina" name="disciplina" [(ngModel)]="form.disciplina" required>
                 <option value="" disabled selected>Selecione a disciplina</option>
-                <option *ngFor="let disciplina of disciplinas" [value]="disciplina">{{ disciplina }}</option>
+                <option *ngFor="let disciplina of disciplinas" [value]="disciplina.id">{{ disciplina.name }}</option>
             </select>
-        </div>
-        <div class="form-group">
-            <label for="nota">Nota (0-10):</label>
-            <input type="number" id="nota" name="nota" [(ngModel)]="form.nota" required min="0" max="10" step="0.1">
+            <p *ngIf="disciplinas.length === 0" class="warning-text">
+                Nenhuma disciplina atribuída.
+            </p>
         </div>
 
         <div class="form-group">
-            <input type="submit" value="Lançar Nota" [disabled]="!notaForm.form.valid">
+            <label for="nota1">Nota 1 (0-10):</label>
+            <input type="number" id="nota1" name="nota1" [(ngModel)]="form.nota1" min="0" max="10" step="0.1">
+        </div>
+
+        <div class="form-group">
+            <label for="nota2">Nota 2 (0-10):</label>
+            <input type="number" id="nota2" name="nota2" [(ngModel)]="form.nota2" min="0" max="10" step="0.1">
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="Salvar Notas" [disabled]="!notaForm.form.valid">
         </div>
 
         <div *ngIf="successMessage" class="success-message">
