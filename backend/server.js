@@ -97,9 +97,6 @@ app.post('/api/auth/login', async (req, res) => {
 
   console.log('Login successful:', user.username);
 
-    return res.status(401).json({ message: 'Credenciais inválidas' });
-  }
-
   // Gera um token simples
   const token = jwt.sign(
     { id: user.id, username: user.username, role: user.role, name: user.name },
@@ -138,10 +135,6 @@ app.post('/api/auth/register', async (req, res) => {
   await db.read();
 
   if (db.data.users.find(u => u.username === finalUsername)) {
-  const { username, password, name, role } = req.body;
-  await db.read();
-
-  if (db.data.users.find(u => u.username === username)) {
     return res.status(400).json({ message: 'Usuário já existe' });
   }
 
@@ -152,10 +145,6 @@ app.post('/api/auth/register', async (req, res) => {
     name: finalName,
     email: email || '',
     role: finalRole
-    username,
-    password, // Em prod, hash a senha!
-    name,
-    role: role || 'student'
   };
 
   db.data.users.push(newUser);
@@ -223,22 +212,6 @@ app.get('/api/alunos/:id/boletim', authenticate, async (req, res) => {
 });
 
 // Frequência do Aluno
-// MODIFICADO: Retorna todas as disciplinas, preenchendo com frequência se houver
-  // Busca as notas e junta com o nome da disciplina
-  const studentGrades = db.data.grades
-    .filter(g => g.studentId === studentId)
-    .map(g => {
-      const subject = db.data.subjects.find(s => s.id === g.subjectId);
-      return {
-        ...g,
-        subjectName: subject ? subject.name : 'Desconhecida'
-      };
-    });
-
-  res.json(studentGrades);
-});
-
-// Frequência do Aluno
 app.get('/api/alunos/:id/frequencia', authenticate, async (req, res) => {
   const studentId = parseInt(req.params.id);
   await db.read();
@@ -267,17 +240,6 @@ app.get('/api/alunos/:id/frequencia', authenticate, async (req, res) => {
   });
 
   res.json(frequencia);
-  const studentAttendance = db.data.attendance
-    .filter(a => a.studentId === studentId)
-    .map(a => {
-      const subject = db.data.subjects.find(s => s.id === a.subjectId);
-      return {
-        ...a,
-        subjectName: subject ? subject.name : 'Desconhecida'
-      };
-    });
-
-  res.json(studentAttendance);
 });
 
 // 3. PROFESSORES
@@ -306,10 +268,6 @@ app.get('/api/professores', authenticate, async (req, res) => {
   await db.read();
   const professors = db.data.users.filter(u => u.role === 'professor');
   res.json(professors);
-});
-
-  const subjects = db.data.subjects.filter(s => s.professorId === professorId);
-  res.json(subjects);
 });
 
 // Lançar Nota
@@ -403,7 +361,13 @@ app.delete('/api/disciplinas/:id', authenticate, async (req, res) => {
 // 5. GENERIC DELETE USER (ADMIN)
 app.delete('/api/users/:id', authenticate, async (req, res) => {
     const rawId = req.params.id; // Keep raw string for debug and backup comparison
-    const id = parseInt(rawId);
+    const id = parseInt(rawId, 10);
+    
+    // Validate that id is a valid number
+    if (isNaN(id)) {
+        return res.status(400).json({ message: 'ID inválido' });
+    }
+    
     console.log(`Deleting user with ID param: ${rawId} (parsed: ${id})`);
 
     await db.read();
@@ -411,37 +375,24 @@ app.delete('/api/users/:id', authenticate, async (req, res) => {
     const initialLength = db.data.users.length;
 
     // Check if ID 1 (Admin) is being targeted
-    // Check both number 1 and string "1"
-    if (id === 1 || rawId === '1') {
+    // Block admin id 1 using both number and string comparison
+    if (id === 1) {
         console.log('Attempt to delete admin user blocked');
         return res.status(403).json({ message: 'Não é possível deletar o administrador principal' });
     }
 
     // Filter using string comparison for safety if types are mixed
-    db.data.users = db.data.users.filter(u => String(u.id) !== rawId);
+    // This handles both numeric IDs stored as numbers and string IDs
+    db.data.users = db.data.users.filter(u => String(u.id) !== String(id));
 
     if (db.data.users.length < initialLength) {
         await db.write();
-        console.log(`User ${rawId} deleted successfully`);
+        console.log(`User ${id} deleted successfully`);
         res.json({ message: 'Usuário removido' });
     } else {
-        console.log(`User ${rawId} not found for deletion. Available IDs:`, db.data.users.map(u => u.id));
+        console.log(`User ${id} not found for deletion. Available IDs:`, db.data.users.map(u => u.id));
         res.status(404).json({ message: 'Usuário não encontrado' });
     }
-  // Simplificação: Vamos apenas adicionar uma nova entrada ou atualizar se tiver ID
-  // Mas para o MVP, vamos adicionar nova.
-
-  const newGrade = {
-    id: Date.now(),
-    studentId,
-    subjectId,
-    value
-  };
-
-  db.data.grades.push(newGrade);
-  await db.write();
-
-  res.status(201).json(newGrade);
 });
 
 // Iniciar Servidor
