@@ -8,7 +8,6 @@ import { AlunoComponent } from './components/aluno/aluno.component';
 import { AdminComponent } from './components/admin/admin.component';
 import { ProfessorComponent } from './components/professor/professor.component';
 import { CadastrarAlunoComponent } from './components/admin/cadastrar-aluno/cadastrar-aluno';
-import { CadastrarCursoComponent } from './components/admin/cadastrar-curso/cadastrar-curso';
 import { CadastrarProfessorComponent } from './components/admin/cadastrar-professor/cadastrar-professor';
 import { CadastrarDisciplinaComponent } from './components/admin/cadastrar-disciplina/cadastrar-disciplina';
 import { GerenciarProvasComponent } from './components/professor/gerenciar-provas/gerenciar-provas';
@@ -50,7 +49,6 @@ export const routes: Routes = [
     component: AdminComponent,
     children: [
       { path: 'cadastrar-aluno', component: CadastrarAlunoComponent },
-      { path: 'cadastrar-curso', component: CadastrarCursoComponent },
       { path: 'cadastrar-professor', component: CadastrarProfessorComponent },
       { path: 'cadastrar-disciplina', component: CadastrarDisciplinaComponent },
       { path: '', redirectTo: 'cadastrar-aluno', pathMatch: 'full' }
