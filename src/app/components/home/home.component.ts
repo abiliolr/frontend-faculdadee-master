@@ -20,6 +20,13 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    if (typeof localStorage !== 'undefined') {
+        const userInfoStr = localStorage.getItem('user_info');
+        if (userInfoStr) {
+            const userInfo = JSON.parse(userInfoStr);
+            this.userRole = userInfo.role;
+            this.userName = userInfo.name;
+        }
     const userInfoStr = localStorage.getItem('user_info');
     if (userInfoStr) {
       const userInfo = JSON.parse(userInfoStr);

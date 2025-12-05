@@ -13,11 +13,17 @@ const httpOptions = {
 })
 export class AlunoService {
 
+  private apiUrl = environment.apiUrl;
   private apiUrl = `${environment.apiUrl}/alunos`;
 
   constructor(private http: HttpClient) { }
 
   getBoletim(studentId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/alunos/${studentId}/boletim`, httpOptions);
+  }
+
+  getFrequencia(studentId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/alunos/${studentId}/frequencia`, httpOptions);
     return this.http.get<any[]>(`${this.apiUrl}/${studentId}/boletim`, httpOptions);
   }
 
