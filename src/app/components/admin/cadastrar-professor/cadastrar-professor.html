@@ -1,27 +1,50 @@
-<div class="form-container">
-    <h2>Cadastro de Professor</h2>
-    <form (ngSubmit)="onSubmit()" #profForm="ngForm">
-        <div class="form-group">
-            <label for="nome">Nome Completo:</label>
-            <input type="text" id="nome" name="nome" [(ngModel)]="form.nome" required>
-        </div>
-        <div class="form-group">
-            <label for="departamento">Departamento:</label>
-            <input type="text" id="departamento" name="departamento" [(ngModel)]="form.departamento" required>
-        </div>
-        <div class="form-group">
-            <label for="email">E-mail:</label>
-            <input type="email" id="email" name="email" [(ngModel)]="form.email" required>
-        </div>
-        <div class="form-group">
-            <input type="submit" value="Cadastrar" [disabled]="!profForm.form.valid">
-        </div>
-        
-        <div *ngIf="successMessage" class="success-message">
-            {{ successMessage }}
-        </div>
-        <div *ngIf="errorMessage" class="error-message">
-            {{ errorMessage }}
-        </div>
-    </form>
+<div class="admin-crud-container">
+    <h2>Gerenciar Professores</h2>
+
+    <div class="form-section">
+        <h3>Novo Professor</h3>
+        <form (ngSubmit)="onSubmit()" #profForm="ngForm">
+            <div class="form-group">
+                <label>Nome Completo:</label>
+                <input type="text" name="name" [(ngModel)]="form.name" required>
+            </div>
+            <div class="form-group">
+                <label>Usuário (Login):</label>
+                <input type="text" name="username" [(ngModel)]="form.username" required>
+            </div>
+            <div class="form-group">
+                <label>Senha:</label>
+                <input type="password" name="password" [(ngModel)]="form.password" required>
+            </div>
+            <div class="form-group">
+                <label>Email (Opcional):</label>
+                <input type="email" name="email" [(ngModel)]="form.email">
+            </div>
+            <button type="submit" [disabled]="!profForm.valid">Cadastrar</button>
+        </form>
+        <p *ngIf="successMessage" class="success">{{ successMessage }}</p>
+        <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+    </div>
+
+    <div class="list-section">
+        <h3>Lista de Professores</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Usuário</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let prof of professores">
+                    <td>{{ prof.name }}</td>
+                    <td>{{ prof.username }}</td>
+                    <td>
+                        <button class="btn-delete" (click)="deleteProfessor(prof.id)">Excluir</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
