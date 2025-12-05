@@ -298,6 +298,16 @@ app.get('/api/professores/:id/disciplinas', authenticate, async (req, res) => {
      subjects = db.data.subjects;
   }
 
+  res.json(subjects);
+});
+
+// Listar todos os professores (Admin)
+app.get('/api/professores', authenticate, async (req, res) => {
+  await db.read();
+  const professors = db.data.users.filter(u => u.role === 'professor');
+  res.json(professors);
+});
+
   const subjects = db.data.subjects.filter(s => s.professorId === professorId);
   res.json(subjects);
 });
@@ -333,6 +343,91 @@ app.post('/api/notas', authenticate, async (req, res) => {
       await db.write();
       return res.status(201).json(newGrade);
   }
+});
+
+// 4. DISCIPLINAS (ADMIN)
+// Listar todas as disciplinas
+app.get('/api/disciplinas', authenticate, async (req, res) => {
+    await db.read();
+
+    // Enriquecer com nome do professor
+    const subjects = db.data.subjects.map(s => {
+        const prof = db.data.users.find(u => u.id === s.professorId);
+        return {
+            ...s,
+            professorName: prof ? prof.name : 'Sem Professor'
+        };
+    });
+
+    res.json(subjects);
+});
+
+// Criar disciplina
+app.post('/api/disciplinas', authenticate, async (req, res) => {
+    const { name, professorId } = req.body;
+
+    if (!name || !professorId) {
+        return res.status(400).json({ message: 'Nome e Professor são obrigatórios' });
+    }
+
+    await db.read();
+
+    const newSubject = {
+        id: Date.now(),
+        name,
+        professorId: parseInt(professorId)
+    };
+
+    db.data.subjects.push(newSubject);
+    await db.write();
+
+    res.status(201).json(newSubject);
+});
+
+// Deletar Disciplina
+app.delete('/api/disciplinas/:id', authenticate, async (req, res) => {
+    const id = parseInt(req.params.id);
+    await db.read();
+
+    const initialLength = db.data.subjects.length;
+    db.data.subjects = db.data.subjects.filter(s => s.id !== id);
+
+    if (db.data.subjects.length < initialLength) {
+        await db.write();
+        res.json({ message: 'Disciplina removida' });
+    } else {
+        res.status(404).json({ message: 'Disciplina não encontrada' });
+    }
+});
+
+// 5. GENERIC DELETE USER (ADMIN)
+app.delete('/api/users/:id', authenticate, async (req, res) => {
+    const rawId = req.params.id; // Keep raw string for debug and backup comparison
+    const id = parseInt(rawId);
+    console.log(`Deleting user with ID param: ${rawId} (parsed: ${id})`);
+
+    await db.read();
+
+    const initialLength = db.data.users.length;
+
+    // Check if ID 1 (Admin) is being targeted
+    // Check both number 1 and string "1"
+    if (id === 1 || rawId === '1') {
+        console.log('Attempt to delete admin user blocked');
+        return res.status(403).json({ message: 'Não é possível deletar o administrador principal' });
+    }
+
+    // Filter using string comparison for safety if types are mixed
+    db.data.users = db.data.users.filter(u => String(u.id) !== rawId);
+
+    if (db.data.users.length < initialLength) {
+        await db.write();
+        console.log(`User ${rawId} deleted successfully`);
+        res.json({ message: 'Usuário removido' });
+    } else {
+        console.log(`User ${rawId} not found for deletion. Available IDs:`, db.data.users.map(u => u.id));
+        res.status(404).json({ message: 'Usuário não encontrado' });
+    }
   // Simplificação: Vamos apenas adicionar uma nova entrada ou atualizar se tiver ID
   // Mas para o MVP, vamos adicionar nova.
 
