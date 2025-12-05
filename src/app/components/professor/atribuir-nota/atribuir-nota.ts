@@ -19,12 +19,17 @@ export class AtribuirNotaComponent implements OnInit {
     disciplina: '',
     nota1: null,
     nota2: null
+    aluno: '', // This will hold the ID now
+    disciplina: '', // This will hold the ID now
+    nota: null
   };
 
   successMessage = '';
   errorMessage = '';
 
   professorId: number | null = null;
+  // TODO: Get real professor ID from Auth
+  professorId = 2;
 
   constructor(private professorService: ProfessorService) {}
 
@@ -47,6 +52,10 @@ export class AtribuirNotaComponent implements OnInit {
         error: (err: any) => console.error('Erro ao carregar disciplinas', err)
         });
     }
+    this.professorService.getDisciplinas(this.professorId).subscribe({
+      next: (data: any[]) => this.disciplinas = data,
+      error: (err: any) => console.error('Erro ao carregar disciplinas', err)
+    });
 
     this.professorService.listarAlunos().subscribe({
       next: (data: any[]) => this.alunos = data,
@@ -73,6 +82,7 @@ export class AtribuirNotaComponent implements OnInit {
       subjectId: parseInt(this.form.disciplina),
       nota1: this.form.nota1,
       nota2: this.form.nota2
+      value: this.form.nota
     };
 
     this.professorService.lancarNota(payload).subscribe({
@@ -83,6 +93,9 @@ export class AtribuirNotaComponent implements OnInit {
         alert(`Notas atualizadas para ${alunoNome} na disciplina ${discNome}!`);
         this.successMessage = 'Notas lançadas com sucesso!';
         this.form = { aluno: '', disciplina: '', nota1: null, nota2: null };
+        alert(`Nota ${this.form.nota} atribuída ao aluno(a) ${alunoNome} na disciplina ${discNome}!`);
+        this.successMessage = 'Nota lançada com sucesso!';
+        this.form = { aluno: '', disciplina: '', nota: null };
       },
       error: (err: any) => {
         console.error('Erro ao lançar nota', err);

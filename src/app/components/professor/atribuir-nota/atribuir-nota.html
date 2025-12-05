@@ -5,6 +5,7 @@
             <label for="aluno">Aluno:</label>
             <select id="aluno" name="aluno" [(ngModel)]="form.aluno" required>
                 <option value="" disabled selected>Selecione o aluno</option>
+                <!-- Agora aluno é um objeto com id e name -->
                 <option *ngFor="let aluno of alunos" [value]="aluno.id">{{ aluno.name }}</option>
             </select>
         </div>
@@ -12,6 +13,7 @@
             <label for="disciplina">Disciplina:</label>
             <select id="disciplina" name="disciplina" [(ngModel)]="form.disciplina" required>
                 <option value="" disabled selected>Selecione a disciplina</option>
+                <!-- Agora disciplina é um objeto com id e name -->
                 <option *ngFor="let disciplina of disciplinas" [value]="disciplina.id">{{ disciplina.name }}</option>
             </select>
             <p *ngIf="disciplinas.length === 0" class="warning-text">

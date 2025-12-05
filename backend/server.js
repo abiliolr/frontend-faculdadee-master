@@ -21,6 +21,11 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// Middleware
+app.use(cors({
+  origin: 'http://localhost:4200',
+  credentials: true
+}));
 app.use(express.json());
 
 // Banco de Dados (LowDB)
@@ -30,6 +35,7 @@ const defaultData = {
   grades: [],
   attendance: [],
   exams: [] // Novo recurso
+  attendance: []
 };
 
 // Inicializa o DB com dados padrão se o arquivo não existir
@@ -63,6 +69,8 @@ async function seedDatabase() {
     db.data.grades.push(
       { id: 1, studentId: 3, subjectId: 101, nota1: 8.5, nota2: null },
       { id: 2, studentId: 3, subjectId: 102, nota1: 6.0, nota2: 7.0 }
+      { id: 1, studentId: 3, subjectId: 101, value: 8.5 },
+      { id: 2, studentId: 3, subjectId: 102, value: 6.0 }
     );
 
     // 4. Frequência
@@ -96,6 +104,9 @@ app.post('/api/auth/login', async (req, res) => {
   }
 
   console.log('Login successful:', user.username);
+
+    return res.status(401).json({ message: 'Credenciais inválidas' });
+  }
 
   // Gera um token simples
   const token = jwt.sign(
@@ -135,6 +146,10 @@ app.post('/api/auth/register', async (req, res) => {
   await db.read();
 
   if (db.data.users.find(u => u.username === finalUsername)) {
+  const { username, password, name, role } = req.body;
+  await db.read();
+
+  if (db.data.users.find(u => u.username === username)) {
     return res.status(400).json({ message: 'Usuário já existe' });
   }
 
@@ -145,6 +160,10 @@ app.post('/api/auth/register', async (req, res) => {
     name: finalName,
     email: email || '',
     role: finalRole
+    username,
+    password, // Em prod, hash a senha!
+    name,
+    role: role || 'student'
   };
 
   db.data.users.push(newUser);
@@ -207,12 +226,29 @@ app.get('/api/alunos/:id/boletim', authenticate, async (req, res) => {
         subjectId: subject.id,
         nota1: null,
         nota2: null,
+        value: null, // Indica sem nota
         subjectName: subject.name
       };
     }
   });
 
   res.json(boletim);
+});
+
+// Frequência do Aluno
+// MODIFICADO: Retorna todas as disciplinas, preenchendo com frequência se houver
+  // Busca as notas e junta com o nome da disciplina
+  const studentGrades = db.data.grades
+    .filter(g => g.studentId === studentId)
+    .map(g => {
+      const subject = db.data.subjects.find(s => s.id === g.subjectId);
+      return {
+        ...g,
+        subjectName: subject ? subject.name : 'Desconhecida'
+      };
+    });
+
+  res.json(studentGrades);
 });
 
 // Frequência do Aluno
@@ -231,6 +267,7 @@ app.get('/api/alunos/:id/frequencia', authenticate, async (req, res) => {
         subjectName: subject.name
       };
     } else {
+      // Padrão se não tiver registro: 40 aulas (mock), 0 faltas
       return {
         id: null,
         studentId: studentId,
@@ -243,6 +280,17 @@ app.get('/api/alunos/:id/frequencia', authenticate, async (req, res) => {
   });
 
   res.json(frequencia);
+  const studentAttendance = db.data.attendance
+    .filter(a => a.studentId === studentId)
+    .map(a => {
+      const subject = db.data.subjects.find(s => s.id === a.subjectId);
+      return {
+        ...a,
+        subjectName: subject ? subject.name : 'Desconhecida'
+      };
+    });
+
+  res.json(studentAttendance);
 });
 
 // 3. PROFESSORES
@@ -254,6 +302,17 @@ app.get('/api/professores/:id/disciplinas', authenticate, async (req, res) => {
   // Se for ID 2 (Professor Mock), retorna as dele.
   // Se for outro professor, retorna apenas as dele.
   let subjects = db.data.subjects.filter(s => s.professorId === professorId);
+
+  // Se for outro professor (criado depois), retorna vazio ou todas para teste?
+  // Vamos assumir que novos professores veem todas as disciplinas por enquanto (simplificação)
+  // ou criar disciplinas padrão para eles.
+  // Melhor: Se não achar disciplinas específicas, retorna todas para que ele possa lançar notas.
+  let subjects = db.data.subjects.filter(s => s.professorId === professorId);
+
+  if (subjects.length === 0) {
+     // Fallback: Professor vê todas as disciplinas (para simplificar o teste do usuário)
+     subjects = db.data.subjects;
+  }
 
   res.json(subjects);
 });
@@ -286,12 +345,38 @@ app.post('/api/notas', authenticate, async (req, res) => {
       return res.status(200).json(existing);
   } else {
       // Create new grade record
+  const subjects = db.data.subjects.filter(s => s.professorId === professorId);
+  res.json(subjects);
+});
+
+// Lançar Nota
+app.post('/api/notas', authenticate, async (req, res) => {
+  const { studentId, subjectId, value } = req.body;
+
+  // Validação simples
+  if (value < 0 || value > 10) {
+    return res.status(400).json({ message: 'Nota deve ser entre 0 e 10' });
+  }
+
+  await db.read();
+
+  // Verifica se já existe nota para essa disciplina/aluno
+  const existingGradeIndex = db.data.grades.findIndex(g => g.studentId === studentId && g.subjectId === subjectId);
+
+  if (existingGradeIndex >= 0) {
+      // Atualiza
+      db.data.grades[existingGradeIndex].value = value;
+      await db.write();
+      return res.status(200).json(db.data.grades[existingGradeIndex]);
+  } else {
+      // Cria nova
       const newGrade = {
         id: Date.now(),
         studentId,
         subjectId,
         nota1: nota1 !== undefined ? nota1 : null,
         nota2: nota2 !== undefined ? nota2 : null
+        value
       };
       db.data.grades.push(newGrade);
       await db.write();
@@ -339,6 +424,7 @@ app.post('/api/disciplinas', authenticate, async (req, res) => {
 });
 
 // Deletar Disciplina (Atualizado para Cascade Delete)
+// Deletar Disciplina
 app.delete('/api/disciplinas/:id', authenticate, async (req, res) => {
     const id = parseInt(req.params.id);
     await db.read();
@@ -379,6 +465,14 @@ app.delete('/api/users/:id', authenticate, async (req, res) => {
         return res.status(403).json({ message: 'Não é possível deletar o administrador principal' });
     }
 
+    // Check if ID 1 (Admin) is being targeted
+    // Check both number 1 and string "1"
+    if (id === 1 || rawId === '1') {
+        console.log('Attempt to delete admin user blocked');
+        return res.status(403).json({ message: 'Não é possível deletar o administrador principal' });
+    }
+
+    // Filter using string comparison for safety if types are mixed
     db.data.users = db.data.users.filter(u => String(u.id) !== rawId);
 
     if (db.data.users.length < initialLength) {
@@ -461,6 +555,26 @@ app.delete('/api/provas/:id', authenticate, async (req, res) => {
     } else {
         res.status(404).json({ message: 'Prova não encontrada' });
     }
+        console.log(`User ${rawId} deleted successfully`);
+        res.json({ message: 'Usuário removido' });
+    } else {
+        console.log(`User ${rawId} not found for deletion. Available IDs:`, db.data.users.map(u => u.id));
+        res.status(404).json({ message: 'Usuário não encontrado' });
+    }
+  // Simplificação: Vamos apenas adicionar uma nova entrada ou atualizar se tiver ID
+  // Mas para o MVP, vamos adicionar nova.
+
+  const newGrade = {
+    id: Date.now(),
+    studentId,
+    subjectId,
+    value
+  };
+
+  db.data.grades.push(newGrade);
+  await db.write();
+
+  res.status(201).json(newGrade);
 });
 
 // Iniciar Servidor

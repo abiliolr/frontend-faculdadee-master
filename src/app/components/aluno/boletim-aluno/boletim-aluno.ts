@@ -18,6 +18,7 @@ export class BoletimAlunoComponent implements OnInit {
   constructor(private alunoService: AlunoService) {}
 
   ngOnInit(): void {
+    // 1. Get User ID from localStorage
     if (typeof localStorage !== 'undefined') {
         const userInfoStr = localStorage.getItem('user_info');
         if (userInfoStr) {
@@ -33,10 +34,17 @@ export class BoletimAlunoComponent implements OnInit {
                 nome: d.subjectName,
                 nota1: d.nota1,
                 nota2: d.nota2
+            // Adapt backend data to UI expectation
+            this.disciplinas = data.map((d: any) => ({
+            nome: d.subjectName,
+            nota1: d.value, // Can be null now
+            nota2: null
             }));
         },
         error: (err: any) => console.error('Erro ao buscar boletim', err)
         });
+    } else {
+        console.error('ID do aluno não encontrado no localStorage');
     }
   }
 
@@ -46,6 +54,7 @@ export class BoletimAlunoComponent implements OnInit {
     const n1 = Number(d.nota1);
     const n2 = Number(d.nota2);
     return ((n1 + n2) / 2).toFixed(1);
+    return ((d.nota1 + d.nota2) / 2).toFixed(1);
   }
 
   calcularSituacao(d: any): string {
@@ -70,6 +79,7 @@ export class BoletimAlunoComponent implements OnInit {
     }
     const n1 = Number(d.nota1);
     const necessaria = (this.mediaAprovacao * 2) - n1;
+    const necessaria = (this.mediaAprovacao * 2) - d.nota1;
     if (necessaria <= 0) return '0.0';
     if (necessaria > 10) return 'Impossível (PF)';
     return necessaria.toFixed(1);
