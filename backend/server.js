@@ -7,6 +7,20 @@ const app = express();
 const PORT = 3000;
 const SECRET_KEY = 'minha_chave_secreta_super_segura'; // Em prod, usar env var
 
+// Middleware Log para Debug
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
+// Middleware CORS
+app.use(cors({
+  origin: ['http://localhost:4200', 'http://127.0.0.1:4200'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 // Middleware
 app.use(cors({
   origin: 'http://localhost:4200',
@@ -70,11 +84,19 @@ await seedDatabase();
 // 1. AUTH
 app.post('/api/auth/login', async (req, res) => {
   const { username, password } = req.body;
+  console.log('Login attempt:', { username, password }); // DEBUG
+
   await db.read();
 
   const user = db.data.users.find(u => u.username === username && u.password === password);
 
   if (!user) {
+    console.log('Login failed: Invalid credentials');
+    return res.status(401).json({ message: 'Credenciais inválidas' });
+  }
+
+  console.log('Login successful:', user.username);
+
     return res.status(401).json({ message: 'Credenciais inválidas' });
   }
 
@@ -96,6 +118,26 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 app.post('/api/auth/register', async (req, res) => {
+  // Ajuste aqui para pegar 'login' como 'username' ou 'usuarioNome' como 'name' se vier assim do front
+  // O front manda: { login, usuarioNome, email, senha }
+  const { login, usuarioNome, email, senha, username, password, name, role } = req.body;
+
+  console.log('Register payload:', req.body); // DEBUG
+
+  // Normalização dos campos
+  const finalUsername = login || username;
+  const finalPassword = senha || password;
+  const finalName = usuarioNome || name;
+  const finalRole = role || 'student';
+
+  if (!finalUsername || !finalPassword) {
+      console.log('Register failed: Missing fields');
+      return res.status(400).json({ message: 'Login e senha são obrigatórios' });
+  }
+
+  await db.read();
+
+  if (db.data.users.find(u => u.username === finalUsername)) {
   const { username, password, name, role } = req.body;
   await db.read();
 
@@ -105,6 +147,11 @@ app.post('/api/auth/register', async (req, res) => {
 
   const newUser = {
     id: Date.now(),
+    username: finalUsername,
+    password: finalPassword, // Em prod, hash a senha!
+    name: finalName,
+    email: email || '',
+    role: finalRole
     username,
     password, // Em prod, hash a senha!
     name,
@@ -114,6 +161,7 @@ app.post('/api/auth/register', async (req, res) => {
   db.data.users.push(newUser);
   await db.write();
 
+  console.log('User registered:', newUser);
   res.status(201).json({ message: 'Usuário criado com sucesso' });
 });
 
@@ -141,10 +189,41 @@ app.get('/api/alunos', authenticate, async (req, res) => {
 });
 
 // Boletim (Notas do Aluno)
+// MODIFICADO: Retorna todas as disciplinas, preenchendo com nota se houver
 app.get('/api/alunos/:id/boletim', authenticate, async (req, res) => {
   const studentId = parseInt(req.params.id);
   await db.read();
 
+  // Pega todas as disciplinas disponíveis
+  const allSubjects = db.data.subjects;
+
+  // Mapeia cada disciplina para um objeto de nota do aluno (existente ou vazio)
+  const boletim = allSubjects.map(subject => {
+    // Tenta achar a nota desse aluno nessa disciplina
+    const grade = db.data.grades.find(g => g.studentId === studentId && g.subjectId === subject.id);
+
+    if (grade) {
+      return {
+        ...grade,
+        subjectName: subject.name
+      };
+    } else {
+      // Se não tem nota, retorna estrutura vazia mas com o nome da disciplina
+      return {
+        id: null,
+        studentId: studentId,
+        subjectId: subject.id,
+        value: null, // Indica sem nota
+        subjectName: subject.name
+      };
+    }
+  });
+
+  res.json(boletim);
+});
+
+// Frequência do Aluno
+// MODIFICADO: Retorna todas as disciplinas, preenchendo com frequência se houver
   // Busca as notas e junta com o nome da disciplina
   const studentGrades = db.data.grades
     .filter(g => g.studentId === studentId)
@@ -164,6 +243,30 @@ app.get('/api/alunos/:id/frequencia', authenticate, async (req, res) => {
   const studentId = parseInt(req.params.id);
   await db.read();
 
+  const allSubjects = db.data.subjects;
+
+  const frequencia = allSubjects.map(subject => {
+    const att = db.data.attendance.find(a => a.studentId === studentId && a.subjectId === subject.id);
+
+    if (att) {
+      return {
+        ...att,
+        subjectName: subject.name
+      };
+    } else {
+      // Padrão se não tiver registro: 40 aulas (mock), 0 faltas
+      return {
+        id: null,
+        studentId: studentId,
+        subjectId: subject.id,
+        absences: 0,
+        totalClasses: 40,
+        subjectName: subject.name
+      };
+    }
+  });
+
+  res.json(frequencia);
   const studentAttendance = db.data.attendance
     .filter(a => a.studentId === studentId)
     .map(a => {
@@ -183,6 +286,18 @@ app.get('/api/professores/:id/disciplinas', authenticate, async (req, res) => {
   const professorId = parseInt(req.params.id);
   await db.read();
 
+  // Se for ID 2 (Professor Mock), retorna as dele.
+  // Se for outro professor (criado depois), retorna vazio ou todas para teste?
+  // Vamos assumir que novos professores veem todas as disciplinas por enquanto (simplificação)
+  // ou criar disciplinas padrão para eles.
+  // Melhor: Se não achar disciplinas específicas, retorna todas para que ele possa lançar notas.
+  let subjects = db.data.subjects.filter(s => s.professorId === professorId);
+
+  if (subjects.length === 0) {
+     // Fallback: Professor vê todas as disciplinas (para simplificar o teste do usuário)
+     subjects = db.data.subjects;
+  }
+
   const subjects = db.data.subjects.filter(s => s.professorId === professorId);
   res.json(subjects);
 });
@@ -199,6 +314,25 @@ app.post('/api/notas', authenticate, async (req, res) => {
   await db.read();
 
   // Verifica se já existe nota para essa disciplina/aluno
+  const existingGradeIndex = db.data.grades.findIndex(g => g.studentId === studentId && g.subjectId === subjectId);
+
+  if (existingGradeIndex >= 0) {
+      // Atualiza
+      db.data.grades[existingGradeIndex].value = value;
+      await db.write();
+      return res.status(200).json(db.data.grades[existingGradeIndex]);
+  } else {
+      // Cria nova
+      const newGrade = {
+        id: Date.now(),
+        studentId,
+        subjectId,
+        value
+      };
+      db.data.grades.push(newGrade);
+      await db.write();
+      return res.status(201).json(newGrade);
+  }
   // Simplificação: Vamos apenas adicionar uma nova entrada ou atualizar se tiver ID
   // Mas para o MVP, vamos adicionar nova.
 
