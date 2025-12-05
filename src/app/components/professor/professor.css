@@ -26,7 +26,7 @@ p {
 
 .sidebar {
     width: 250px;
-    background: #242627; /* Cor da sidebar do Admin */
+    background: #1565c0; /* Azul acadêmico */
     color: #fff;
     position: fixed;
     height: 100%;
@@ -64,7 +64,7 @@ p {
 }
 
 .sidebar-nav a {
-    color: #ccc;
+    color: #e3f2fd; /* Azul claro */
     text-decoration: none;
     font-size: 18px;
     display: block;
@@ -75,7 +75,7 @@ p {
 
 .sidebar-nav a:hover,
 .sidebar-nav a.active {
-    background: #000000;
+    background: #0d47a1; /* Azul escuro */
     color: #fff;
 }
 

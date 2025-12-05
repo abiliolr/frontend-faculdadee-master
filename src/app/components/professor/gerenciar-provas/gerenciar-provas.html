@@ -5,8 +5,11 @@
             <label for="disciplina">Disciplina:</label>
             <select id="disciplina" name="disciplina" [(ngModel)]="form.disciplina" required>
                 <option value="" disabled selected>Selecione a disciplina</option>
-                <option *ngFor="let disciplina of disciplinas" [value]="disciplina">{{ disciplina }}</option>
+                <option *ngFor="let disciplina of disciplinas" [value]="disciplina.id">{{ disciplina.name }}</option>
             </select>
+            <p *ngIf="disciplinas.length === 0" class="warning-text">
+                Nenhuma disciplina atribuída.
+            </p>
         </div>
         <div class="form-group">
             <label for="nomeProva">Nome da Prova:</label>
@@ -16,6 +19,10 @@
             <label for="data">Data:</label>
             <input type="date" id="data" name="data" [(ngModel)]="form.data" required>
         </div>
+        <div class="form-group">
+            <label for="horario">Horário:</label>
+            <input type="time" id="horario" name="horario" [(ngModel)]="form.horario" required>
+        </div>
 
         <div class="form-group">
             <input type="submit" value="Agendar Prova" [disabled]="!provaForm.form.valid">
@@ -24,5 +31,37 @@
         <div *ngIf="successMessage" class="success-message">
             {{ successMessage }}
         </div>
+        <div *ngIf="errorMessage" class="error-message">
+            {{ errorMessage }}
+        </div>
     </form>
+</div>
+
+<div class="form-container" style="margin-top: 2rem;">
+    <h3>Provas Agendadas</h3>
+    <table class="provas-table" *ngIf="provasAgendadas.length > 0; else noProvas">
+        <thead>
+            <tr>
+                <th>Disciplina</th>
+                <th>Prova</th>
+                <th>Data</th>
+                <th>Horário</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let prova of provasAgendadas">
+                <td>{{ prova.subjectName }}</td>
+                <td>{{ prova.name }}</td>
+                <td>{{ prova.date }}</td>
+                <td>{{ prova.time }}</td>
+                <td>
+                    <button class="btn-delete" (click)="deleteProva(prova.id)">Cancelar</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <ng-template #noProvas>
+        <p style="text-align: center; color: #666;">Nenhuma prova agendada.</p>
+    </ng-template>
 </div>
