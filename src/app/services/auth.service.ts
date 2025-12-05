@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
-// MUDANÇA 1: Adicionar o httpOptions com 'withCredentials'
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
-  withCredentials: true // ESSENCIAL para enviar o cookie de sessão
+  withCredentials: true
 };
 
 @Injectable({
@@ -13,7 +13,7 @@ const httpOptions = {
 })
 export class AuthService {
 
-  private apiUrl = 'http://localhost:8080/api/auth';
+  private apiUrl = `${environment.apiUrl}/auth`;
 
   constructor(private http: HttpClient) { }
 
@@ -24,7 +24,17 @@ export class AuthService {
         username: credentials.username,
         password: credentials.password
       },
-      httpOptions // MUDANÇA 2: Passar as opções aqui
+      httpOptions
+    ).pipe(
+      tap((response: any) => {
+        if (response.token && typeof localStorage !== 'undefined') {
+          localStorage.setItem('auth_token', response.token);
+          // Also store user info if needed
+          if (response.user) {
+            localStorage.setItem('user_info', JSON.stringify(response.user));
+          }
+        }
+      })
     );
   }
 
@@ -32,7 +42,21 @@ export class AuthService {
     return this.http.post(
       `${this.apiUrl}/register`,
       user,
-      httpOptions // MUDANÇA 3: Passar as opções aqui também
+      httpOptions
     );
+  }
+
+  logout(): void {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_info');
+    }
+  }
+
+  getToken(): string | null {
+    if (typeof localStorage !== 'undefined') {
+      return localStorage.getItem('auth_token');
+    }
+    return null;
   }
 }
