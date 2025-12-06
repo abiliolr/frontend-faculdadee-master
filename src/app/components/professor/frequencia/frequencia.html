@@ -22,9 +22,14 @@
             <p>Faltas Atuais: <strong>{{ currentAbsences !== null ? currentAbsences : '-' }}</strong></p>
         </div>
 
-        <button class="btn-increment" (click)="incrementarFrequencia()">
-            <span class="icon">+</span> Registrar Falta
-        </button>
+        <div class="buttons-row">
+            <button class="btn-decrement" (click)="decrementarFrequencia()" title="Remover falta">
+                <span class="icon">-</span>
+            </button>
+            <button class="btn-increment" (click)="incrementarFrequencia()" title="Adicionar falta">
+                <span class="icon">+</span>
+            </button>
+        </div>
     </div>
 
     <p *ngIf="message" class="feedback-msg">{{ message }}</p>

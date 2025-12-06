@@ -299,11 +299,11 @@ app.post('/api/notas', authenticate, async (req, res) => {
   }
 });
 
-// Registrar Frequência (Incrementar ou Definir)
+// Registrar Frequência (Incrementar, Decrementar ou Definir)
 app.post('/api/frequencia', authenticate, async (req, res) => {
     const { studentId, subjectId, action, absences } = req.body;
 
-    // action: 'increment' adds 1. absences: number sets specific value.
+    // action: 'increment' | 'decrement'
     if (!studentId || !subjectId) {
         return res.status(400).json({ message: 'Aluno e Disciplina são obrigatórios' });
     }
@@ -317,17 +317,24 @@ app.post('/api/frequencia', authenticate, async (req, res) => {
         record = db.data.attendance[index];
         if (action === 'increment') {
             record.absences += 1;
+        } else if (action === 'decrement') {
+            if (record.absences > 0) {
+                record.absences -= 1;
+            }
         } else if (absences !== undefined) {
             record.absences = absences;
         }
         await db.write();
     } else {
         // Create new record
+        const initialAbsences = action === 'increment' ? 1 : (absences || 0);
+        // If decrementing a non-existent record, assume 0 -> 0.
+
         record = {
             id: Date.now(),
             studentId,
             subjectId,
-            absences: action === 'increment' ? 1 : (absences || 0),
+            absences: initialAbsences,
             totalClasses: 40 // Default
         };
         db.data.attendance.push(record);

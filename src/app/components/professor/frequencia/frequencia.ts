@@ -26,7 +26,7 @@ export class FrequenciaComponent implements OnInit {
 
   constructor(
     private professorService: ProfessorService,
-    private alunoService: AlunoService // Reuse to fetch student current attendance if needed
+    private alunoService: AlunoService
   ) {}
 
   ngOnInit(): void {
@@ -60,16 +60,11 @@ export class FrequenciaComponent implements OnInit {
       });
   }
 
-  // When selection changes, try to fetch current attendance
   onSelectionChange(): void {
       this.message = '';
       this.currentAbsences = null;
 
       if (this.form.disciplina && this.form.aluno) {
-          // Fetch current attendance for this pair.
-          // Reuse AlunoService.getFrequencia logic?
-          // getFrequencia returns *all* subjects for a student.
-          // Efficient enough for now.
           this.alunoService.getFrequencia(parseInt(this.form.aluno)).subscribe({
               next: (data) => {
                   const subjectId = parseInt(this.form.disciplina);
@@ -86,6 +81,14 @@ export class FrequenciaComponent implements OnInit {
   }
 
   incrementarFrequencia(): void {
+      this.atualizarFrequencia('increment');
+  }
+
+  decrementarFrequencia(): void {
+      this.atualizarFrequencia('decrement');
+  }
+
+  atualizarFrequencia(action: 'increment' | 'decrement'): void {
       if (!this.form.disciplina || !this.form.aluno) {
           alert('Selecione disciplina e aluno.');
           return;
@@ -94,17 +97,17 @@ export class FrequenciaComponent implements OnInit {
       const payload = {
           studentId: parseInt(this.form.aluno),
           subjectId: parseInt(this.form.disciplina),
-          action: 'increment'
+          action: action
       };
 
       this.professorService.registrarFrequencia(payload).subscribe({
           next: (res) => {
-              this.message = 'Falta registrada com sucesso!';
+              this.message = action === 'increment' ? 'Falta adicionada!' : 'Falta removida!';
               this.currentAbsences = res.absences;
           },
           error: (err) => {
               console.error(err);
-              this.message = 'Erro ao registrar falta.';
+              this.message = 'Erro ao atualizar frequência.';
           }
       });
   }

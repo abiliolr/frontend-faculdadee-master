@@ -46,8 +46,12 @@ select {
     margin-bottom: 1rem;
 }
 
-.btn-increment {
-    background-color: #d32f2f;
+.buttons-row {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.btn-increment, .btn-decrement {
     color: white;
     border: none;
     border-radius: 50%;
@@ -62,8 +66,21 @@ select {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
+.btn-increment {
+    background-color: #d32f2f; /* Red */
+}
+
 .btn-increment:hover {
     background-color: #b71c1c;
+    transform: scale(1.1);
+}
+
+.btn-decrement {
+    background-color: #1976d2; /* Blue */
+}
+
+.btn-decrement:hover {
+    background-color: #0d47a1;
     transform: scale(1.1);
 }
 
