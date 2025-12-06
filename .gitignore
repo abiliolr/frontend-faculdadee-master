@@ -42,6 +42,13 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 
+# Backend (Node)
+backend/node_modules
+backend/db.json
+
+# Backend (Java)
+backend-java/target
+backend-java/*.iml
 # Backend
 backend/node_modules
 backend/db.json

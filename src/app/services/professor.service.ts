@@ -37,6 +37,9 @@ export class ProfessorService {
   deleteProva(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/provas/${id}`, httpOptions);
   }
+
+  registrarFrequencia(data: { studentId: number; subjectId: number; action?: string; absences?: number }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/frequencia`, data, httpOptions);
   lancarNota(notaData: { studentId: number; subjectId: number; value: number }): Observable<any> {
     return this.http.post(`${this.apiUrl}/notas`, notaData, httpOptions);
   }

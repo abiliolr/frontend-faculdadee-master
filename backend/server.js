@@ -384,6 +384,51 @@ app.post('/api/notas', authenticate, async (req, res) => {
   }
 });
 
+// Registrar Frequência (Incrementar, Decrementar ou Definir)
+app.post('/api/frequencia', authenticate, async (req, res) => {
+    const { studentId, subjectId, action, absences } = req.body;
+
+    // action: 'increment' | 'decrement'
+    if (!studentId || !subjectId) {
+        return res.status(400).json({ message: 'Aluno e Disciplina são obrigatórios' });
+    }
+
+    await db.read();
+
+    const index = db.data.attendance.findIndex(a => a.studentId === studentId && a.subjectId === subjectId);
+
+    let record;
+    if (index >= 0) {
+        record = db.data.attendance[index];
+        if (action === 'increment') {
+            record.absences += 1;
+        } else if (action === 'decrement') {
+            if (record.absences > 0) {
+                record.absences -= 1;
+            }
+        } else if (absences !== undefined) {
+            record.absences = absences;
+        }
+        await db.write();
+    } else {
+        // Create new record
+        const initialAbsences = action === 'increment' ? 1 : (absences || 0);
+        // If decrementing a non-existent record, assume 0 -> 0.
+
+        record = {
+            id: Date.now(),
+            studentId,
+            subjectId,
+            absences: initialAbsences,
+            totalClasses: 40 // Default
+        };
+        db.data.attendance.push(record);
+        await db.write();
+    }
+
+    res.json(record);
+});
+
 // 4. DISCIPLINAS (ADMIN)
 // Listar todas as disciplinas
 app.get('/api/disciplinas', authenticate, async (req, res) => {
