@@ -12,6 +12,9 @@
     "start:backend": "cd backend-java && mvn spring-boot:run",
     "start:frontend": "ng serve",
     "postinstall": "echo 'Backend dependencies managed by Maven'"
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "ng serve",
+    "postinstall": "cd backend && npm install"
   },
   "prettier": {
     "printWidth": 100,

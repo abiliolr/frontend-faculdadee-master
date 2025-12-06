@@ -25,6 +25,7 @@ export class ProfessorService {
     return this.http.get<any[]>(`${this.apiUrl}/alunos`, httpOptions);
   }
 
+  // Updated to support new payload structure if strictly typed, but 'any' covers it.
   lancarNota(notaData: { studentId: number; subjectId: number; nota1?: number | null; nota2?: number | null }): Observable<any> {
     return this.http.post(`${this.apiUrl}/notas`, notaData, httpOptions);
   }
@@ -39,5 +40,7 @@ export class ProfessorService {
 
   registrarFrequencia(data: { studentId: number; subjectId: number; action?: string; absences?: number }): Observable<any> {
     return this.http.post(`${this.apiUrl}/frequencia`, data, httpOptions);
+  lancarNota(notaData: { studentId: number; subjectId: number; value: number }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/notas`, notaData, httpOptions);
   }
 }
