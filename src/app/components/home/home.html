@@ -1,2 +1,29 @@
-<h1>Bem-vindo!</h1>
-<p>Seu login foi realizado com sucesso.</p>
+<div class="home-container">
+    <header>
+        <h1>Bem-vindo ao Sistema Acadêmico</h1>
+        <p *ngIf="userName">Olá, <strong>{{ userName }}</strong> ({{ userRole }})</p>
+    </header>
+
+    <div class="cards-container">
+        <!-- Card Aluno -->
+        <div class="card" (click)="navigateTo('/aluno', 'student')">
+            <div class="icon">🎓</div>
+            <h2>Portal do Aluno</h2>
+            <p>Acesse suas notas, frequências e calendário.</p>
+        </div>
+
+        <!-- Card Professor -->
+        <div class="card" (click)="navigateTo('/professor', 'professor')">
+            <div class="icon">👨‍🏫</div>
+            <h2>Portal do Professor</h2>
+            <p>Gerencie notas, lançamentos e turmas.</p>
+        </div>
+
+        <!-- Card Admin -->
+        <div class="card" (click)="navigateTo('/admin', 'admin')">
+            <div class="icon">⚙️</div>
+            <h2>Portal do Administrador</h2>
+            <p>Gerencie usuários, cursos e configurações.</p>
+        </div>
+    </div>
+</div>
